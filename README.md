@@ -13,3 +13,6 @@ echarts的所有组件
 
 ### echarts-beedrill.js
 echarts的组件(仅折线、柱状、饼图、地图、值域)
+
+### echarts-seel.js
+echarts的组件(仅折线、柱状、饼图、值域)

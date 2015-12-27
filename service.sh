@@ -60,6 +60,16 @@ service_spark()
   service_handle
 }
 
+# service-hive
+service_hive()
+{
+  service_name="hive"
+  service_path="/Users/tanliqingcn/SoftWare/settings/hive/hive-1.0.1/bin"
+  service_start="./hive"
+  service_stop="echo $service_name has no stop command"
+  service_handle
+}
+
 # service启动
 service_start()
 {
@@ -111,6 +121,7 @@ executionSequence_bigData()
   # service_zooKeeper
   # service_hadoop
   # service_spark
+  # service_hive
 }
 
 # service-执行顺序

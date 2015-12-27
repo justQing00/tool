@@ -70,6 +70,16 @@ service_redis()
   service_handle
 }
 
+# service-elasticsearch
+service_elasticsearch()
+{
+  service_name="elasticsearch"
+  service_path="/Users/tanliqingcn/SoftWare/settings/elasticsearch/elasticsearch-1.6.0"
+  service_start="bin/elasticsearch"
+  service_stop="echo $service_name has no stop command"
+  service_handle
+}
+
 # service-cassandra
 service_cassandra()
 {
@@ -133,6 +143,7 @@ executionSequence_base()
   # service_mysql
   # service_nginx
   # service_redis
+  # service_elasticsearch
 }
 
 # service-大数据相关服务

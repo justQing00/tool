@@ -13,7 +13,10 @@ service_isRestart=true
 
 # echo 输出颜色值
 color_blue="\033[36m"
+color_white="\033[37m"
 color_base=$color_blue
+color_other=$color_white
+
 # service-mysql
 service_mysql()
 {
@@ -128,13 +131,14 @@ service_start()
 {
   if ps -ef | grep $service_name | egrep -v grep >/dev/null;then
     echo "$color_base $service_name is started. And $service_name will restart."
+    echo "$color_other now $service_name service will export execution process results"
     cd $service_path
     eval $service_stop
     eval $service_start
     echo "$color_base $service_name is restarted."
   else
     echo "$color_base $service_name will start."
-    echo "\033[37m"
+    echo "$color_other now $service_name service will export execution process results"
     cd $service_path
     eval $service_start
     echo "$color_base $service_name is started."
@@ -145,6 +149,7 @@ service_start()
 service_stop()
 {
   echo "$color_base $service_name will stop."
+  echo "$color_other now $service_name service will export execution process results"
   cd $service_path
   eval $service_stop
   echo "$color_base $service_name is stoped."

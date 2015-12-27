@@ -60,6 +60,16 @@ service_spark()
   service_handle
 }
 
+# service-cassandra
+service_cassandra()
+{
+  service_name="cassandra"
+  service_path="/usr/local/Cellar/cassandra/2.2.2/bin"
+  service_start="cassandra"
+  service_stop="echo $service_name has no stop command"
+  service_handle
+}
+
 # service-hive
 service_hive()
 {
@@ -122,6 +132,7 @@ executionSequence_bigData()
   # service_hadoop
   # service_spark
   # service_hive
+  # service_cassandra
 }
 
 # service-执行顺序

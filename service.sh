@@ -131,14 +131,14 @@ service_start()
 {
   if ps -ef | grep $service_name | egrep -v grep >/dev/null;then
     echo "$color_base""$service_name is started. And $service_name will restart."
-    echo "$color_other""now $service_name service will export execution process results"
+    echo "$color_other""now $service_name service will export execution process results."
     cd $service_path
     eval $service_stop
     eval $service_start
     echo "$color_base""$service_name is restarted."
   else
     echo "$color_base""$service_name will start."
-    echo "$color_other""now $service_name service will export execution process results"
+    echo "$color_other""now $service_name service will export execution process results."
     cd $service_path
     eval $service_start
     echo "$color_base""$service_name is started."
@@ -149,7 +149,7 @@ service_start()
 service_stop()
 {
   echo "$color_base""$service_name will stop."
-  echo "$color_other""now $service_name service will export execution process results"
+  echo "$color_other""now $service_name service will export execution process results."
   cd $service_path
   eval $service_stop
   echo "$color_base""$service_name is stoped."
@@ -204,8 +204,8 @@ case "$1" in
     ;;
   *)
     echo "$color_base""Commands: "
-    echo "  start: start all service"
-    echo "  stop: stop all service"
+    echo "  start: start all service."
+    echo "  stop: stop all service which has stop command."
     echo "Comments: These services include mysql、nginx、redis、elasticsearch、"
     echo "          elasticsearch、zookeeper、hadoop、spark、hive、cassandra."
     exit 1

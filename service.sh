@@ -76,9 +76,31 @@ service_stop()
   echo "$service_name is stoped."
 }
 
-exec_type=$exec_type_start
-service_mysql
-service_nginx
-service_zooKeeper
+# service-执行顺序
+executionSequence()
+{
+  echo "$exec_type"
+  # service_mysql
+  # service_nginx
+  # service_zooKeeper
+}
 
-exit 0
+case "$1" in
+  'start')
+    exec_type=$exec_type_start
+    executionSequence
+    ;;
+  'stop')
+    exec_type=$exec_type_stop
+    executionSequence
+    ;;
+  *)
+    echo "Commands: "
+    echo "  start: start all service"
+    echo "  stop: stop all service"
+    echo "Comments: These services include mysql、nginx、redis、elasticsearch、"
+    echo "          elasticsearch、zookeeper、hadoop、spark、hive、cassandra."
+    exit 1
+    ;;
+esac
+

@@ -9,6 +9,7 @@ service_name=""
 service_path=""
 service_start=""
 service_stop=""
+service_isRestart=true
 
 # service-mysql
 service_mysql()
@@ -17,6 +18,7 @@ service_mysql()
   service_path="/Users/tanliqingcn"
   service_start="mysql.server start"
   service_stop="mysql.server stop"
+  service_isRestart=true
   service_handle
 }
 
@@ -27,6 +29,7 @@ service_nginx()
   service_path="/Users/tanliqingcn"
   service_start="sudo nginx"
   service_stop="sudo nginx -s stop"
+  service_isRestart=true
   service_handle
 }
 
@@ -37,6 +40,7 @@ service_zooKeeper()
   service_path="/Users/tanliqingcn"
   service_start="zkServer start"
   service_stop="zkServer stop"
+  service_isRestart=true
   service_handle
 }
 
@@ -47,6 +51,7 @@ service_hadoop()
   service_path="/Users/tanliqingcn/SoftWare/settings/hadoop/hadoop-2.7.1/sbin"
   service_start="./start-all.sh"
   service_stop="./stop-all.sh"
+  service_isRestart=true
   service_handle
 }
 
@@ -57,6 +62,7 @@ service_spark()
   service_path="/usr/local/Cellar/apache-spark/1.5.1/libexec/sbin"
   service_start="./start-all.sh"
   service_stop="./stop-all.sh"
+  service_isRestart=true
   service_handle
 }
 
@@ -67,6 +73,7 @@ service_redis()
   service_path="/Users/tanliqingcn/SoftWare/settings/redis/data"
   service_start="redis-server"
   service_stop="echo $service_name has no stop command"
+  service_isRestart=false
   service_handle
 }
 
@@ -77,6 +84,7 @@ service_elasticsearch()
   service_path="/Users/tanliqingcn/SoftWare/settings/elasticsearch/elasticsearch-1.6.0"
   service_start="bin/elasticsearch"
   service_stop="echo $service_name has no stop command"
+  service_isRestart=false
   service_handle
 }
 
@@ -87,6 +95,7 @@ service_cassandra()
   service_path="/usr/local/Cellar/cassandra/2.2.2/bin"
   service_start="cassandra"
   service_stop="echo $service_name has no stop command"
+  service_isRestart=false
   service_handle
 }
 
@@ -97,10 +106,21 @@ service_hive()
   service_path="/Users/tanliqingcn/SoftWare/settings/hive/hive-1.0.1/bin"
   service_start="./hive"
   service_stop="echo $service_name has no stop command"
+  service_isRestart=false
   service_handle
 }
 
-# service启动
+# service-复杂的启动处理
+service_start_complex()
+{
+  if [ "$service_isRestart" = true ];then
+    service_start
+  else
+    echo "$service_name cannot restarted because of no stop command."
+  fi
+}
+
+# service-默认的启动处理
 service_start()
 {
   if ps -ef | grep $service_name | egrep -v grep >/dev/null;then
@@ -117,7 +137,7 @@ service_start()
   fi
 }
 
-# service停止
+# service-停止
 service_stop()
 {
   echo "$service_name will stop."
@@ -126,11 +146,11 @@ service_stop()
   echo "$service_name is stoped."
 }
 
-# service处理
+# service-处理
 service_handle()
 {
   if [ "$exec_type" = "$exec_type_start" ];then
-    service_start
+    service_start_complex
   else
     service_stop
   fi
@@ -140,21 +160,21 @@ service_handle()
 executionSequence_base()
 {
   echo "Will $exec_type the basic service."
-  # service_mysql
-  # service_nginx
-  # service_redis
-  # service_elasticsearch
+  service_mysql
+  service_nginx
+  service_redis
+  service_elasticsearch
 }
 
 # service-大数据相关服务
 executionSequence_bigData()
 {
   echo "Will $exec_type the big data service."
-  # service_zooKeeper
-  # service_hadoop
-  # service_spark
-  # service_hive
-  # service_cassandra
+  service_zooKeeper
+  service_hadoop
+  service_spark
+  service_hive
+  service_cassandra
 }
 
 # service-执行顺序

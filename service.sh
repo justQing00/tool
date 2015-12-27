@@ -23,11 +23,20 @@ service_mysql()
 # service-nginx
 service_nginx()
 {
-  echo "service_nginx"
   service_name="nginx"
   service_path="/Users/tanliqingcn"
   service_start="sudo nginx"
   service_stop="sudo nginx -s stop"
+  service_handle
+}
+
+# service-zooKeeper
+service_zooKeeper()
+{
+  service_name="zooKeeper"
+  service_path="/Users/tanliqingcn"
+  service_start="zkServer start"
+  service_stop="zkServer stop"
   service_handle
 }
 
@@ -70,5 +79,6 @@ service_stop()
 exec_type=$exec_type_start
 service_mysql
 service_nginx
+service_zooKeeper
 
 exit 0

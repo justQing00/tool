@@ -96,18 +96,18 @@ service_handle()
   fi
 }
 
-# 基础服务启动
+# service-基础服务
 executionSequence_base()
 {
-  echo "Will start the basic service."
+  echo "Will $exec_type the basic service."
   # service_mysql
   # service_nginx
 }
 
-# 大数据相关服务启动
+# service-大数据相关服务
 executionSequence_bigData()
 {
-  echo "Will start the big data service."
+  echo "Will $exec_type the big data service."
   # service_zooKeeper
   # service_hadoop
   # service_spark

@@ -122,7 +122,7 @@ service_start_complex()
   if [ "$service_isRestart" = true ];then
     service_start
   else
-    echo "$color_base $service_name cannot restarted because of no stop command."
+    echo "$color_base""$service_name cannot restarted because of no stop command."
   fi
 }
 
@@ -130,29 +130,29 @@ service_start_complex()
 service_start()
 {
   if ps -ef | grep $service_name | egrep -v grep >/dev/null;then
-    echo "$color_base $service_name is started. And $service_name will restart."
-    echo "$color_other now $service_name service will export execution process results"
+    echo "$color_base""$service_name is started. And $service_name will restart."
+    echo "$color_other""now $service_name service will export execution process results"
     cd $service_path
     eval $service_stop
     eval $service_start
-    echo "$color_base $service_name is restarted."
+    echo "$color_base""$service_name is restarted."
   else
-    echo "$color_base $service_name will start."
-    echo "$color_other now $service_name service will export execution process results"
+    echo "$color_base""$service_name will start."
+    echo "$color_other""now $service_name service will export execution process results"
     cd $service_path
     eval $service_start
-    echo "$color_base $service_name is started."
+    echo "$color_base""$service_name is started."
   fi
 }
 
 # service-停止
 service_stop()
 {
-  echo "$color_base $service_name will stop."
-  echo "$color_other now $service_name service will export execution process results"
+  echo "$color_base""$service_name will stop."
+  echo "$color_other""now $service_name service will export execution process results"
   cd $service_path
   eval $service_stop
-  echo "$color_base $service_name is stoped."
+  echo "$color_base""$service_name is stoped."
 }
 
 # service-处理
@@ -168,7 +168,7 @@ service_handle()
 # service-基础服务
 executionSequence_base()
 {
-  echo "$color_base Will $exec_type the basic service."
+  echo "$color_base""Will $exec_type the basic service."
   service_mysql
   service_nginx
   service_redis
@@ -178,7 +178,7 @@ executionSequence_base()
 # service-大数据相关服务
 executionSequence_bigData()
 {
-  echo "$color_base Will $exec_type the big data service."
+  echo "$color_base""Will $exec_type the big data service."
   service_zooKeeper
   service_hadoop
   service_spark
@@ -203,11 +203,11 @@ case "$1" in
     executionSequence
     ;;
   *)
-    echo "$color_base Commands: "
-    echo "   start: start all service"
-    echo "   stop: stop all service"
-    echo " Comments: These services include mysql、nginx、redis、elasticsearch、"
-    echo "           elasticsearch、zookeeper、hadoop、spark、hive、cassandra."
+    echo "$color_base""Commands: "
+    echo "  start: start all service"
+    echo "  stop: stop all service"
+    echo "Comments: These services include mysql、nginx、redis、elasticsearch、"
+    echo "          elasticsearch、zookeeper、hadoop、spark、hive、cassandra."
     exit 1
     ;;
 esac

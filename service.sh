@@ -60,6 +60,16 @@ service_spark()
   service_handle
 }
 
+# service-redis
+service_redis()
+{
+  service_name="redis"
+  service_path="/Users/tanliqingcn/SoftWare/settings/redis/data"
+  service_start="redis-server"
+  service_stop="echo $service_name has no stop command"
+  service_handle
+}
+
 # service-cassandra
 service_cassandra()
 {
@@ -122,6 +132,7 @@ executionSequence_base()
   echo "Will $exec_type the basic service."
   # service_mysql
   # service_nginx
+  # service_redis
 }
 
 # service-大数据相关服务

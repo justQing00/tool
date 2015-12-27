@@ -50,14 +50,14 @@ service_hadoop()
   service_handle
 }
 
-# service处理
-service_handle()
+# service-spark
+service_spark()
 {
-  if [ "$exec_type" = "$exec_type_start" ];then
-    service_start
-  else
-    service_stop
-  fi
+  service_name="spark"
+  service_path="/usr/local/Cellar/apache-spark/1.5.1/libexec/sbin"
+  service_start="./start-all.sh"
+  service_stop="./stop-all.sh"
+  service_handle
 }
 
 # service启动
@@ -86,9 +86,20 @@ service_stop()
   echo "$service_name is stoped."
 }
 
+# service处理
+service_handle()
+{
+  if [ "$exec_type" = "$exec_type_start" ];then
+    service_start
+  else
+    service_stop
+  fi
+}
+
 # 基础服务启动
 executionSequence_base()
 {
+  echo "Will start the basic service."
   # service_mysql
   # service_nginx
 }
@@ -96,14 +107,15 @@ executionSequence_base()
 # 大数据相关服务启动
 executionSequence_bigData()
 {
+  echo "Will start the big data service."
   # service_zooKeeper
   # service_hadoop
+  # service_spark
 }
 
 # service-执行顺序
 executionSequence()
 {
-  echo "$exec_type"
   executionSequence_base
   executionSequence_bigData
 }

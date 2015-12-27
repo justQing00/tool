@@ -40,6 +40,16 @@ service_zooKeeper()
   service_handle
 }
 
+# service-hadoop
+service_hadoop()
+{
+  service_name="hadoop"
+  service_path="/Users/tanliqingcn/SoftWare/settings/hadoop/hadoop-2.7.1/sbin"
+  service_start="./start-all.sh"
+  service_stop="./stop-all.sh"
+  service_handle
+}
+
 # service处理
 service_handle()
 {
@@ -76,13 +86,26 @@ service_stop()
   echo "$service_name is stoped."
 }
 
+# 基础服务启动
+executionSequence_base()
+{
+  # service_mysql
+  # service_nginx
+}
+
+# 大数据相关服务启动
+executionSequence_bigData()
+{
+  # service_zooKeeper
+  # service_hadoop
+}
+
 # service-执行顺序
 executionSequence()
 {
   echo "$exec_type"
-  # service_mysql
-  # service_nginx
-  # service_zooKeeper
+  executionSequence_base
+  executionSequence_bigData
 }
 
 case "$1" in

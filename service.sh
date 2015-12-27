@@ -13,7 +13,7 @@ service_isRestart=true
 
 # echo 输出颜色值
 color_blue="\033[36m"
-
+color_base=$color_blue
 # service-mysql
 service_mysql()
 {
@@ -119,7 +119,7 @@ service_start_complex()
   if [ "$service_isRestart" = true ];then
     service_start
   else
-    echo "$color_blue $service_name cannot restarted because of no stop command."
+    echo "$color_base $service_name cannot restarted because of no stop command."
   fi
 }
 
@@ -127,27 +127,27 @@ service_start_complex()
 service_start()
 {
   if ps -ef | grep $service_name | egrep -v grep >/dev/null;then
-    echo "$color_blue $service_name is started. And $service_name will restart."
+    echo "$color_base $service_name is started. And $service_name will restart."
     cd $service_path
     eval $service_stop
     eval $service_start
-    echo "$color_blue $service_name is restarted."
+    echo "$color_base $service_name is restarted."
   else
-    echo "$color_blue $service_name will start."
+    echo "$color_base $service_name will start."
     echo "\033[37m"
     cd $service_path
     eval $service_start
-    echo "$color_blue $service_name is started."
+    echo "$color_base $service_name is started."
   fi
 }
 
 # service-停止
 service_stop()
 {
-  echo "$color_blue $service_name will stop."
+  echo "$color_base $service_name will stop."
   cd $service_path
   eval $service_stop
-  echo "$color_blue $service_name is stoped."
+  echo "$color_base $service_name is stoped."
 }
 
 # service-处理
@@ -163,7 +163,7 @@ service_handle()
 # service-基础服务
 executionSequence_base()
 {
-  echo "$color_blue Will $exec_type the basic service."
+  echo "$color_base Will $exec_type the basic service."
   service_mysql
   service_nginx
   service_redis
@@ -173,7 +173,7 @@ executionSequence_base()
 # service-大数据相关服务
 executionSequence_bigData()
 {
-  echo "$color_blue Will $exec_type the big data service."
+  echo "$color_base Will $exec_type the big data service."
   service_zooKeeper
   service_hadoop
   service_spark
@@ -198,7 +198,7 @@ case "$1" in
     executionSequence
     ;;
   *)
-    echo "$color_blue Commands: "
+    echo "$color_base Commands: "
     echo "   start: start all service"
     echo "   stop: stop all service"
     echo " Comments: These services include mysql、nginx、redis、elasticsearch、"

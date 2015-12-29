@@ -1,4 +1,7 @@
 #!/bin/sh
+
+# 所有服务管理
+
 # service执行类型
 exec_type=""
 exec_type_start="start"
@@ -80,7 +83,7 @@ service_redis()
   service_start="redis-server"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
-  service_handle
+  # service_handle
 }
 
 # service-elasticsearch
@@ -91,7 +94,7 @@ service_elasticsearch()
   service_start="bin/elasticsearch"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
-  service_handle
+  # service_handle
 }
 
 # service-cassandra
@@ -122,7 +125,17 @@ service_start_complex()
   if [ "$service_isRestart" = true ];then
     service_start
   else
+    service_start_once
+  fi
+}
+
+# service-只能启动一次的
+service_start_once()
+{
+  if ps -ef | grep $service_name | egrep -v grep >/dev/null;then
     echo "$color_base""$service_name cannot restarted because of no stop command."
+  else
+    service_start
   fi
 }
 

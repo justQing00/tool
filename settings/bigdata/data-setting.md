@@ -118,21 +118,20 @@ hdfs的有关命令
 4）启动metastore服务
 * 注意hive-site这个地方
 
-...
+'
     <property>
     <name>hive.metastore.uris</name>
     <value>thrift://127.0.0.1:9083</value>
     </property>
-...
+'
 
 
 * 命令
-
-...
+'
     > ./hive --service metastore
-...
+'
 
-5）依据参考链接，测试安装成功后，读取hdfs中的数据
+5）依据参考链接，测试安装成功后，读取hdfs中的数据 <br>
 hive创建数据库
 
     > CREATE DATABASE sqltest01;

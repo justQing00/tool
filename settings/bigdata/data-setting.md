@@ -1,5 +1,6 @@
 ﻿# 大数据安装配置教程
-                              By tanlq@terminus.io
+By tanlq@terminus.io
+
 ## 1、基本知识
 ### 1、1 数据流向：
 
@@ -177,5 +178,5 @@ hive创建数据表
     > sqlContext.sql("SELECT * FROM pigmall_members").collect().foreach(println)
 
 ### 2、5 cassandra v2.2.2
-1）待总结，以前保存的链接没有了
+1）brew install即可
 

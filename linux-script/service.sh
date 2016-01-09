@@ -12,6 +12,7 @@ service_name=""
 service_path=""
 service_start=""
 service_stop=""
+service_log=""
 service_isRestart=true
 
 # echo 输出颜色值
@@ -68,7 +69,7 @@ service_zooKeeper()
 service_hadoop()
 {
   service_name="hadoop"
-  service_path=$user_folder+"hadoop/hadoop-2.7.1/sbin"
+  service_path=$user_folder"hadoop/hadoop-2.7.1/sbin"
   service_start="./start-all.sh"
   service_stop="./stop-all.sh"
   service_isRestart=true
@@ -79,7 +80,7 @@ service_hadoop()
 service_spark()
 {
   service_name="spark"
-  service_path=$brew_folder+"apache-spark/1.5.1/libexec/sbin"
+  service_path=$brew_folder"apache-spark/1.5.1/libexec/sbin"
   service_start="./start-all.sh"
   service_stop="./stop-all.sh"
   service_isRestart=true
@@ -90,30 +91,33 @@ service_spark()
 service_redis()
 {
   service_name="redis"
-  service_path=$user_folder+"redis/data"
-  service_start="redis-server"
+  service_path=$user_folder"redis/data"
+  service_log=$out_folder_log$service_name".log"
+  service_start="nohup redis-server > $service_log"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
-  # service_handle
+  service_handle
 }
 
 # service-elasticsearch
 service_elasticsearch()
 {
   service_name="elasticsearch"
-  service_path=$user_folder+"elasticsearch/elasticsearch-1.6.0"
-  service_start="bin/elasticsearch"
+  service_path=$user_folder"elasticsearch/elasticsearch-1.6.0"
+  service_log=$out_folder_log$service_name".log"
+  service_start="nohup bin/elasticsearch > $service_log"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
-  # service_handle
+  service_handle
 }
 
 # service-cassandra
 service_cassandra()
 {
   service_name="cassandra"
-  service_path=$brew_folder+"cassandra/2.2.2/bin"
-  service_start="cassandra"
+  service_path=$brew_folder"cassandra/2.2.2/bin"
+  service_log=$out_folder_log$service_name".log"
+  service_start="nohup cassandra > $service_log"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
   service_handle
@@ -123,8 +127,9 @@ service_cassandra()
 service_hive()
 {
   service_name="hive"
-  service_path=$user_folder+"hive/hive-1.0.1/bin"
-  service_start="./hive"
+  service_path=$user_folder"hive/hive-1.0.1/bin"
+  service_log=$out_folder_log$service_name".log"
+  service_start="nohup ./hive --service metastore > $service_log"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
   service_handle

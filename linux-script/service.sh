@@ -117,7 +117,7 @@ service_cassandra()
   service_name="cassandra"
   service_path=$brew_folder"cassandra/2.2.2/bin"
   service_log=$out_folder_log$service_name".log"
-  service_start="nohup cassandra > $service_log ;exit"
+  service_start="nohup cassandra > $service_log"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
   service_handle
@@ -200,8 +200,6 @@ executionSequence_base()
   echo "$color_base""Will $exec_type the basic service."
   service_mysql
   service_nginx
-  service_redis
-  service_elasticsearch
 }
 
 # service-大数据相关服务
@@ -211,9 +209,15 @@ executionSequence_bigData()
   service_zooKeeper
   service_hadoop
   service_spark
-  service_hive
-  service_cassandra
 }
+
+# 暂时不能解决有：命令不能退出且具有前后启动关系的任务执行的问题
+# 互不影响的执行
+execution_no_effect()
+{
+  service_redis & service_elasticsearch & service_hive & service_cassandra
+}
+
 # 清空日志
 clearLogs()
 {
@@ -227,6 +231,7 @@ executionSequence()
   clearLogs
   executionSequence_base
   executionSequence_bigData
+  execution_no_effect
 }
 
 case "$1" in

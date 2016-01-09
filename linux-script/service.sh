@@ -23,7 +23,7 @@ color_other=$color_white
 
 # 系统命令
 command_system=""
-command_terminal_open="open -a terminal"
+command_terminal_open="open -a terminal &&"
 
 # 输出目录
 out_folder_log="/Users/tanliqingcn/SoftWare/settings/logs/service_my/"
@@ -39,7 +39,7 @@ service_mysql()
   service_path=$user_folder
   service_start="mysql.server start"
   service_stop="mysql.server stop"
-  service_isRestart=true
+  service_isRestart=false
   service_handle
 }
 
@@ -117,7 +117,7 @@ service_cassandra()
   service_name="cassandra"
   service_path=$brew_folder"cassandra/2.2.2/bin"
   service_log=$out_folder_log$service_name".log"
-  service_start="nohup cassandra > $service_log"
+  service_start="nohup cassandra > $service_log ;exit"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
   service_handle
@@ -214,10 +214,17 @@ executionSequence_bigData()
   service_hive
   service_cassandra
 }
-
+# 清空日志
+clearLogs()
+{
+  echo "Will clear logs."
+  eval "cd $out_folder_log"
+  eval "rm *"
+}
 # service-执行顺序
 executionSequence()
 {
+  clearLogs
   executionSequence_base
   executionSequence_bigData
 }

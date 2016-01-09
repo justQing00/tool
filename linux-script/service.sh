@@ -20,11 +20,22 @@ color_white="\033[37m"
 color_base=$color_blue
 color_other=$color_white
 
+# 系统命令
+command_system=""
+command_terminal_open="open -a terminal"
+
+# 输出目录
+out_folder_log="/Users/tanliqingcn/SoftWare/settings/logs/service_my/"
+# 用户目录
+user_folder="/Users/tanliqingcn/SoftWare/settings/"
+# brew目录
+brew_folder="/usr/local/Cellar/"
+
 # service-mysql
 service_mysql()
 {
   service_name="mysql"
-  service_path="/Users/tanliqingcn"
+  service_path=$user_folder
   service_start="mysql.server start"
   service_stop="mysql.server stop"
   service_isRestart=true
@@ -35,7 +46,7 @@ service_mysql()
 service_nginx()
 {
   service_name="nginx"
-  service_path="/Users/tanliqingcn"
+  service_path=$user_folder
   service_start="sudo nginx"
   service_stop="sudo nginx -s stop"
   service_isRestart=true
@@ -57,7 +68,7 @@ service_zooKeeper()
 service_hadoop()
 {
   service_name="hadoop"
-  service_path="/Users/tanliqingcn/SoftWare/settings/hadoop/hadoop-2.7.1/sbin"
+  service_path=$user_folder+"hadoop/hadoop-2.7.1/sbin"
   service_start="./start-all.sh"
   service_stop="./stop-all.sh"
   service_isRestart=true
@@ -68,7 +79,7 @@ service_hadoop()
 service_spark()
 {
   service_name="spark"
-  service_path="/usr/local/Cellar/apache-spark/1.5.1/libexec/sbin"
+  service_path=$brew_folder+"apache-spark/1.5.1/libexec/sbin"
   service_start="./start-all.sh"
   service_stop="./stop-all.sh"
   service_isRestart=true
@@ -79,7 +90,7 @@ service_spark()
 service_redis()
 {
   service_name="redis"
-  service_path="/Users/tanliqingcn/SoftWare/settings/redis/data"
+  service_path=$user_folder+"redis/data"
   service_start="redis-server"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
@@ -90,7 +101,7 @@ service_redis()
 service_elasticsearch()
 {
   service_name="elasticsearch"
-  service_path="/Users/tanliqingcn/SoftWare/settings/elasticsearch/elasticsearch-1.6.0"
+  service_path=$user_folder+"elasticsearch/elasticsearch-1.6.0"
   service_start="bin/elasticsearch"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
@@ -101,7 +112,7 @@ service_elasticsearch()
 service_cassandra()
 {
   service_name="cassandra"
-  service_path="/usr/local/Cellar/cassandra/2.2.2/bin"
+  service_path=$brew_folder+"cassandra/2.2.2/bin"
   service_start="cassandra"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false
@@ -112,7 +123,7 @@ service_cassandra()
 service_hive()
 {
   service_name="hive"
-  service_path="/Users/tanliqingcn/SoftWare/settings/hive/hive-1.0.1/bin"
+  service_path=$user_folder+"hive/hive-1.0.1/bin"
   service_start="./hive"
   service_stop="echo $service_name has no stop command"
   service_isRestart=false

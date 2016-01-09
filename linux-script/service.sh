@@ -218,7 +218,7 @@ executionSequence_bigData()
 clearLogs()
 {
   echo "Will clear logs."
-  eval "cd $out_folder_log"
+  cd $out_folder_log
   eval "rm *"
 }
 # service-执行顺序

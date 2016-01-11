@@ -8,9 +8,8 @@ color_base=$color_blue
 color_other=$color_white
 
 # 组件的基本信息
-user_folder="~/"
-project_folder=$user_folder"SoftWare/gitProject/"
-project_name=""
+project_folder=""
+link=""
 component_path=""
 component_name=""
 component_target=""
@@ -34,29 +33,38 @@ component_file_scss="view.scss"
 # 创建hbs文件
 creat_h()
 {
-  className_hbs=""
-  touch $component_file_hbs
+  className_hbs=${link/\//\ }
+  echo "className_hbs:"$className_hbs
+  # touch $component_file_hbs
 }
 
 # 创建hbs、coffee文件
 creat_hc()
 {
   creat_h
-  className_coffee=""
-  touch $component_file_coffee
+  className_coffee=$(echo $component_name|sed 's/_\(.\)/\U\1/g')
+  echo "className_coffee:"$className_coffee
+  # touch $component_file_coffee
 }
 
 # 创建hbs、coffee、scss文件
 creat_hcs()
 {
   creat_hc
-  className_scss=""
-  touch $component_file_scss
+  className_scss=${className_hbs/\ /\.}
+  echo "className_scss:"$className_scss
+  # touch $component_file_scss
 }
 
+# 执行创建流程
 executionCreat()
 {
   echo "Will create file now"
+  link="/live-stock"
+  component_name=${link/\//\ }
+  component_name=${component_name/\-/\_}
+  echo "component_name:"$component_name
+  creat_hcs
 }
 
 case "$1" in

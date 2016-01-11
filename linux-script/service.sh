@@ -2,6 +2,12 @@
 
 # 所有服务管理
 
+# echo 输出颜色值
+color_blue="\033[36m"
+color_white="\033[37m"
+color_base=$color_blue
+color_other=$color_white
+
 # service执行类型
 exec_type=""
 exec_type_start="start"
@@ -15,20 +21,10 @@ service_stop=""
 service_log=""
 service_isRestart=true
 
-# echo 输出颜色值
-color_blue="\033[36m"
-color_white="\033[37m"
-color_base=$color_blue
-color_other=$color_white
-
-# 系统命令
-command_system=""
-command_terminal_open="open -a terminal &&"
-
-# 输出目录
-out_folder_log="/Users/tanliqingcn/SoftWare/settings/logs/service_my/"
 # 用户目录
 user_folder="/Users/tanliqingcn/SoftWare/settings/"
+# 输出目录
+out_folder_log=$user_folder"logs/service_my/"
 # brew目录
 brew_folder="/usr/local/Cellar/"
 

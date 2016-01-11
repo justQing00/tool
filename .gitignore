@@ -1,1 +1,7 @@
 rake_file
+
+*.log
+
+*.coffee
+*.scss
+*.hbs

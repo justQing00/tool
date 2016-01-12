@@ -39,20 +39,42 @@ def create_file(file_name, folder_name):
 # 写入文件
 def write_file(file_create, file_name):
   link = "/live-stock"
-  str_empty = get_file_content(file_name);
+  str_empty = get_file_content(file_name, link);
   file_create.write(str_empty);
   return
 
 # 获得文件内容
-def get_file_content(file_name):
+def get_file_content(file_name, link):
   str_empty = ""
+  className = get_class_name(file_name, link);
   if file_name == component_file_hbs:
-    str_empty = '{{#component "report-boar-production custom js-comp"}}\n\n{{/component}}';
+    str_empty = '{{#component "js-comp '+ className + '"}}\n\n{{/component}}';
   elif file_name == component_file_coffee:
-    str_empty = '###\n' + file_author + '\n###\n class BoarProduction\n  constructor: ($) -> \n    @bindEvents()\n\n  bindEvents: ->\n\nmodule.exports = BoarProduction';
+    str_empty = '###\n' + file_author + '\n###\n class ' + className + '\n  constructor: ($) -> \n    @bindEvents()\n\n  bindEvents: ->\n\nmodule.exports = ' + className;
   elif file_name == component_file_scss:
-    str_empty = '.boar-production {\n\n}'
+    str_empty = className + ' {\n\n}'
   return str_empty
+
+# 获得类名
+def get_class_name(file_name, link):
+  className = ""
+  className = ''.join(link.split('/'))
+  if file_name == component_file_hbs:
+    className = className
+  elif file_name == component_file_coffee:
+    className = str_capitalize(className)
+  elif file_name == component_file_scss:
+    className = "." + className
+  return className
+
+# 首字母大写
+def str_capitalize(link):
+  className = ""
+  strList = link.split('-')
+  for word in strList:
+    print word
+    className = className + word.capitalize()
+  return className
 
 # 创建hbs文件
 def create_file_h(folder_name):
@@ -61,15 +83,15 @@ def create_file_h(folder_name):
 
 # 创建hbs、coffee文件
 def create_file_hc(folder_name):
-  create_file(component_file_hbs, folder_name)
   create_file(component_file_coffee, folder_name)
+  create_file(component_file_hbs, folder_name)
   return
 
 # 创建hbs、coffee、scss文件
 def create_file_hcs(folder_name):
-  create_file(component_file_hbs, folder_name)
-  create_file(component_file_coffee, folder_name)
   create_file(component_file_scss, folder_name)
+  create_file(component_file_coffee, folder_name)
+  create_file(component_file_hbs, folder_name)
   return
 
 # 创建文件夹

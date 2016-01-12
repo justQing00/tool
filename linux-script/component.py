@@ -25,26 +25,48 @@ component_file_coffee = "view.coffee"
 component_file_hbs = "view.hbs"
 component_file_scss = "view.scss"
 
+# 文件备注
+file_author = "  author by terminus.io (tanlq)"
+
 # 创建文件
 def create_file(file_name, folder_name):
   print "Create "+ file_name + " in " + folder_name
   file_create = open(file_name, 'w');
+  write_file(file_create, file_name)
   file_create.close();
   return
 
+# 写入文件
+def write_file(file_create, file_name):
+  link = "/live-stock"
+  str_empty = get_file_content(file_name);
+  file_create.write(str_empty);
+  return
+
+# 获得文件内容
+def get_file_content(file_name):
+  str_empty = ""
+  if file_name == component_file_hbs:
+    str_empty = '{{#component "report-boar-production custom js-comp"}}\n\n{{/component}}';
+  elif file_name == component_file_coffee:
+    str_empty = '###\n' + file_author + '\n###\n class BoarProduction\n  constructor: ($) -> \n    @bindEvents()\n\n  bindEvents: ->\n\nmodule.exports = BoarProduction';
+  elif file_name == component_file_scss:
+    str_empty = '.boar-production {\n\n}'
+  return str_empty
+
 # 创建hbs文件
-def create_file_h(file_name, folder_name):
+def create_file_h(folder_name):
   create_file(component_file_hbs, folder_name)
   return
 
 # 创建hbs、coffee文件
-def create_file_hc(file_name, folder_name):
+def create_file_hc(folder_name):
   create_file(component_file_hbs, folder_name)
   create_file(component_file_coffee, folder_name)
   return
 
 # 创建hbs、coffee、scss文件
-def create_file_hcs(file_name, folder_name):
+def create_file_hcs(folder_name):
   create_file(component_file_hbs, folder_name)
   create_file(component_file_coffee, folder_name)
   create_file(component_file_scss, folder_name)
@@ -84,9 +106,9 @@ def init_component():
       flag = flag.lower();
     if flag == 'n':
       EnterFlag = False;
-      createComponent(component_path, component_type)
+      createComponent(component_path, component_type);
   return
 
-init_component()
+init_component();
 
 

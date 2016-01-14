@@ -8,6 +8,9 @@ link = ""
 component_path = ""
 component_name = ""
 component_target = ""
+git_project_path = "/Users/tanliqingcn/SoftWare/gitProject/"
+project_name = ""
+app_components = "/app/components/"
 
 # 组件类型
 component_type = ""
@@ -29,16 +32,15 @@ component_file_scss = "view.scss"
 file_author = "  author by terminus.io (tanlq)"
 
 # 创建文件
-def create_file(file_name, folder_name):
+def create_file(file_name, folder_name, link):
   print "Create "+ file_name + " in " + folder_name
   file_create = open(file_name, 'w');
-  write_file(file_create, file_name)
+  write_file(file_create, file_name, link)
   file_create.close();
   return
 
 # 写入文件
-def write_file(file_create, file_name):
-  link = "/live-stock"
+def write_file(file_create, file_name, link):
   str_empty = get_file_content(file_name, link);
   file_create.write(str_empty);
   return
@@ -77,21 +79,21 @@ def str_capitalize(link):
   return className
 
 # 创建hbs文件
-def create_file_h(folder_name):
-  create_file(component_file_hbs, folder_name)
+def create_file_h(folder_name, link):
+  create_file(component_file_hbs, folder_name, link)
   return
 
 # 创建hbs、coffee文件
-def create_file_hc(folder_name):
-  create_file(component_file_coffee, folder_name)
-  create_file(component_file_hbs, folder_name)
+def create_file_hc(folder_name, link):
+  create_file(component_file_coffee, folder_name, link)
+  create_file(component_file_hbs, folder_name, link)
   return
 
 # 创建hbs、coffee、scss文件
-def create_file_hcs(folder_name):
-  create_file(component_file_scss, folder_name)
-  create_file(component_file_coffee, folder_name)
-  create_file(component_file_hbs, folder_name)
+def create_file_hcs(folder_name, link):
+  create_file(component_file_scss, folder_name, link)
+  create_file(component_file_coffee, folder_name, link)
+  create_file(component_file_hbs, folder_name, link)
   return
 
 # 创建文件夹
@@ -104,18 +106,21 @@ def create_folder(folder_name):
   return
 
 # 创建组件
-def createComponent(component_path, component_type):
-  if component_type == component_type_h:
-    create_file_h(component_path);
-  elif component_type == component_type_hc:
-    create_file_hc(component_path);
-  elif component_type == component_type_hcs:
-    create_file_hcs(component_path);
+def createComponent(component_path, component_type, linkList):
+  for link in linkList:
+    if component_type == component_type_h:
+      create_file_h(component_path, link);
+    elif component_type == component_type_hc:
+      create_file_hc(component_path, link);
+    elif component_type == component_type_hcs:
+      create_file_hcs(component_path, link);
   return
 
 # 初始化组件方法
 def init_component():
-  component_path = raw_input('Component Path: ');
+  print "My git path: " + git_project_path
+  project_name = raw_input('Project Name: ');
+  component_path = git_project_path + project_name + app_components
   component_type = raw_input('Component Type["hbs", "hbsCoffee", "hbsCoffeeScss", "comp"]: ');
   linkList = []
   EnterFlag = True
@@ -128,7 +133,7 @@ def init_component():
       flag = flag.lower();
     if flag == 'n':
       EnterFlag = False;
-      createComponent(component_path, component_type);
+      createComponent(component_path, component_type, linkList);
   return
 
 init_component();

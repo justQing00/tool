@@ -51,7 +51,7 @@ def create_folder(folder_name, componentName):
   componentName = get_component_name(componentName)
   print "Create folder " + folder_name + componentName;
   try:
-    os.mkdir(folder_name);
+    os.mkdir(folder_name+ componentName);
   except:
     print folder_name + " already exist"
   return
@@ -111,17 +111,21 @@ def create_file_hcs(folder_name, link):
   create_file(component_file_hbs, folder_name, link)
   return
 
+# 创建文件夹河文件
+def create_folder_file(component_path, link, component_type):
+  create_folder(component_path, link);
+  if component_type == component_type_h:
+    create_file_h(component_path, link);
+  elif component_type == component_type_hc:
+    create_file_hc(component_path, link);
+  elif component_type == component_type_hcs:
+    create_file_hcs(component_path, link);
+
 # 创建组件
 def createComponent(component_path, component_type, linkList):
   for link in linkList:
     link = ''.join(link.split('/'))
-    create_folder(component_path, link);
-    if component_type == component_type_h:
-      create_file_h(component_path, link);
-    elif component_type == component_type_hc:
-      create_file_hc(component_path, link);
-    elif component_type == component_type_hcs:
-      create_file_hcs(component_path, link);
+    create_folder_file(component_path, link, component_type);
   return
 
 # 初始化组件方法

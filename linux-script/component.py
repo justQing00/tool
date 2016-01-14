@@ -33,10 +33,27 @@ file_author = "  author by terminus.io (tanlq)"
 
 # 创建文件
 def create_file(file_name, folder_name, link):
-  print "Create "+ file_name + " in " + folder_name
-  file_create = open(file_name, 'w');
-  write_file(file_create, file_name, link)
+  component_name = get_component_name(link);
+  file_path = folder_name + component_name + file_name;
+  print "Create "+ file_name + " in " + file_path;
+  file_create = open(file_path, 'w');
+  write_file(file_create, file_name, link);
   file_create.close();
+  return
+
+# 获得组件名称
+def get_component_name(componentName):
+  componentName = componentName.replace('-','_')
+  return componentName + "/"
+
+# 创建文件夹
+def create_folder(folder_name, componentName):
+  componentName = get_component_name(componentName)
+  print "Create folder " + folder_name + componentName;
+  try:
+    os.mkdir(folder_name);
+  except:
+    print folder_name + " already exist"
   return
 
 # 写入文件
@@ -58,9 +75,7 @@ def get_file_content(file_name, link):
   return str_empty
 
 # 获得类名
-def get_class_name(file_name, link):
-  className = ""
-  className = ''.join(link.split('/'))
+def get_class_name(file_name, className):
   if file_name == component_file_hbs:
     className = className
   elif file_name == component_file_coffee:
@@ -96,18 +111,11 @@ def create_file_hcs(folder_name, link):
   create_file(component_file_hbs, folder_name, link)
   return
 
-# 创建文件夹
-def create_folder(folder_name):
-  print "Create folder " + folder_name;
-  try:
-    os.mkdir(folder_name);
-  except:
-    print folder_name + " already exist"
-  return
-
 # 创建组件
 def createComponent(component_path, component_type, linkList):
   for link in linkList:
+    link = ''.join(link.split('/'))
+    create_folder(component_path, link);
     if component_type == component_type_h:
       create_file_h(component_path, link);
     elif component_type == component_type_hc:

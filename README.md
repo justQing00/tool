@@ -24,7 +24,7 @@ echarts的组件(仅折线、柱状、饼图、值域)
 echarts3的组件(仅折线、柱状、饼图)
 
 #### 2.2 echarts3-beedrill.js
-echarts3的组件(仅折线、柱状、饼图、散点、雷达图、地图、值域)
+echarts3的组件(仅折线、柱状、饼图、散点、雷达图、地图、值域、数据映射)
 
 #### 2.3 echarts3-china.js
 echarts3中的中国地图数据

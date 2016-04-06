@@ -42,3 +42,10 @@ echarts3中的shine主题数据
 &nbsp;&nbsp;&nbsp; stop: 关闭有关闭命令的服务.
 #####  备注:
 &nbsp;&nbsp;&nbsp; These services include mysql、nginx、redis、elasticsearch、zookeeper、hadoop、spark、hive、cassandra.
+
+### 4.date-range
+[来源](https://github.com/longbill/jquery-date-range-picker)
+4.1 daterangepicker.js
+时间区域选择器js文件
+4.2 daterangepicker.css
+时间区域选择器css文件

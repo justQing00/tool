@@ -7,3 +7,5 @@ rake_file
 *.hbs
 
 *.cql
+node_modules
+dist

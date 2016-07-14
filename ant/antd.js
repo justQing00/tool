@@ -836,7 +836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
       var weekOfYear = getWeekNumber(this, fixedDateJan1, fixedDate);
 
-      // æœ¬å‘¨æ²¡æœ‰è¶³å¤Ÿçš„æ—¶é—´åœ¨å½“å‰å¹´
+      // 本周没有足够的时间在当前年
       if (weekOfYear === 0) {
         // If the date belongs to the last week of the
         // previous year, use the week number of "12/31" of
@@ -845,14 +845,14 @@ return /******/ (function(modules) { // webpackBootstrap
         var prevJan1 = fixedDateJan1 - getYearLength(year - 1);
         weekOfYear = getWeekNumber(this, prevJan1, fixedDec31);
       } else
-        // æœ¬å‘¨æ˜¯å¹´æœ«æœ€åŽä¸€å‘¨ï¼Œå¯èƒ½æœ‰è¶³å¤Ÿçš„æ—¶é—´åœ¨æ–°çš„ä¸€å¹´
+        // 本周是年末最后一周，可能有足够的时间在新的一年
         if (weekOfYear >= 52) {
           var nextJan1 = fixedDateJan1 + getYearLength(year);
           var nextJan1st = getDayOfWeekDateOnOrBefore(nextJan1 + 6, this.firstDayOfWeek);
           var nDays = nextJan1st - nextJan1;
-          // æœ¬å‘¨æœ‰è¶³å¤Ÿå¤©æ•°åœ¨æ–°çš„ä¸€å¹´
+          // 本周有足够天数在新的一年
           if (nDays >= this.minimalDaysInFirstWeek &&
-          // å½“å¤©ç¡®å®žåœ¨æœ¬å‘¨ï¼ŒweekOfYear === 53 æ—¶æ˜¯ä¸éœ€è¦è¿™ä¸ªåˆ¤æ–­
+          // 当天确实在本周，weekOfYear === 53 时是不需要这个判断
           fixedDate >= nextJan1st - 7) {
             weekOfYear = 1;
           }
@@ -2814,12 +2814,12 @@ return /******/ (function(modules) { // webpackBootstrap
     var doc = elem.ownerDocument;
     var body = doc.body;
     var docElem = doc && doc.documentElement;
-    // æ ¹æ® GBS æœ€æ–°æ•°æ®ï¼ŒA-Grade Browsers éƒ½å·²æ”¯æŒ getBoundingClientRect æ–¹æ³•ï¼Œä¸ç”¨å†è€ƒè™‘ä¼ ç»Ÿçš„å®žçŽ°æ–¹å¼
+    // 根据 GBS 最新数据，A-Grade Browsers 都已支持 getBoundingClientRect 方法，不用再考虑传统的实现方式
     box = elem.getBoundingClientRect();
 
-    // æ³¨ï¼šjQuery è¿˜è€ƒè™‘å‡åŽ» docElem.clientLeft/clientTop
-    // ä½†æµ‹è¯•å‘çŽ°ï¼Œè¿™æ ·åè€Œä¼šå¯¼è‡´å½“ html å’Œ body æœ‰è¾¹è·/è¾¹æ¡†æ ·å¼æ—¶ï¼ŒèŽ·å–çš„å€¼ä¸æ­£ç¡®
-    // æ­¤å¤–ï¼Œie6 ä¼šå¿½ç•¥ html çš„ margin å€¼ï¼Œå¹¸è¿åœ°æ˜¯æ²¡æœ‰è°ä¼šåŽ»è®¾ç½® html çš„ margin
+    // 注：jQuery 还考虑减去 docElem.clientLeft/clientTop
+    // 但测试发现，这样反而会导致当 html 和 body 有边距/边框样式时，获取的值不正确
+    // 此外，ie6 会忽略 html 的 margin 值，幸运地是没有谁会去设置 html 的 margin
 
     x = box.left;
     y = box.top;
@@ -2836,13 +2836,13 @@ return /******/ (function(modules) { // webpackBootstrap
     // getClientBoundingRect we have already forced a reflow, so it is not
     // too expensive just to query them all.
 
-    // ie ä¸‹åº”è¯¥å‡åŽ»çª—å£çš„è¾¹æ¡†å§ï¼Œæ¯•ç«Ÿé»˜è®¤ absolute éƒ½æ˜¯ç›¸å¯¹çª—å£å®šä½çš„
-    // çª—å£è¾¹æ¡†æ ‡å‡†æ˜¯è®¾ documentElement ,quirks æ—¶è®¾ç½® body
-    // æœ€å¥½ç¦æ­¢åœ¨ body å’Œ html ä¸Šè¾¹æ¡† ï¼Œä½† ie < 9 html é»˜è®¤æœ‰ 2px ï¼Œå‡åŽ»
-    // ä½†æ˜¯éž ie ä¸å¯èƒ½è®¾ç½®çª—å£è¾¹æ¡†ï¼Œbody html ä¹Ÿä¸æ˜¯çª—å£ ,ie å¯ä»¥é€šè¿‡ html,body è®¾ç½®
-    // æ ‡å‡† ie ä¸‹ docElem.clientTop å°±æ˜¯ border-top
-    // ie7 html å³çª—å£è¾¹æ¡†æ”¹å˜ä¸äº†ã€‚æ°¸è¿œä¸º 2
-    // ä½†æ ‡å‡† firefox/chrome/ie9 ä¸‹ docElem.clientTop æ˜¯çª—å£è¾¹æ¡†ï¼Œå³ä½¿è®¾äº† border-top ä¹Ÿä¸º 0
+    // ie 下应该减去窗口的边框吧，毕竟默认 absolute 都是相对窗口定位的
+    // 窗口边框标准是设 documentElement ,quirks 时设置 body
+    // 最好禁止在 body 和 html 上边框 ，但 ie < 9 html 默认有 2px ，减去
+    // 但是非 ie 不可能设置窗口边框，body html 也不是窗口 ,ie 可以通过 html,body 设置
+    // 标准 ie 下 docElem.clientTop 就是 border-top
+    // ie7 html 即窗口边框改变不了。永远为 2
+    // 但标准 firefox/chrome/ie9 下 docElem.clientTop 是窗口边框，即使设了 border-top 也为 0
 
     x -= docElem.clientLeft || body.clientLeft || 0;
     y -= docElem.clientTop || body.clientTop || 0;
@@ -2907,10 +2907,10 @@ return /******/ (function(modules) { // webpackBootstrap
     // http://msdn.microsoft.com/en-us/library/ms535231.aspx
     var ret = elem[CURRENT_STYLE] && elem[CURRENT_STYLE][name];
 
-    // å½“ width/height è®¾ç½®ä¸ºç™¾åˆ†æ¯”æ—¶ï¼Œé€šè¿‡ pixelLeft æ–¹å¼è½¬æ¢çš„ width/height å€¼
-    // ä¸€å¼€å§‹å°±å¤„ç†äº†! CUSTOM_STYLE.height,CUSTOM_STYLE.width ,cssHook è§£å†³@2011-08-19
-    // åœ¨ ie ä¸‹ä¸å¯¹ï¼Œéœ€è¦ç›´æŽ¥ç”¨ offset æ–¹å¼
-    // borderWidth ç­‰å€¼ä¹Ÿæœ‰é—®é¢˜ï¼Œä½†è€ƒè™‘åˆ° borderWidth è®¾ä¸ºç™¾åˆ†æ¯”çš„æ¦‚çŽ‡å¾ˆå°ï¼Œè¿™é‡Œå°±ä¸è€ƒè™‘äº†
+    // 当 width/height 设置为百分比时，通过 pixelLeft 方式转换的 width/height 值
+    // 一开始就处理了! CUSTOM_STYLE.height,CUSTOM_STYLE.width ,cssHook 解决@2011-08-19
+    // 在 ie 下不对，需要直接用 offset 方式
+    // borderWidth 等值也有问题，但考虑到 borderWidth 设为百分比的概率很小，这里就不考虑了
 
     // From the awesome hack by Dean Edwards
     // http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
@@ -2961,7 +2961,7 @@ return /******/ (function(modules) { // webpackBootstrap
     }
   }
 
-  // è®¾ç½® elem ç›¸å¯¹ elem.ownerDocument çš„åæ ‡
+  // 设置 elem 相对 elem.ownerDocument 的坐标
   function setOffset(elem, offset, option) {
     // set position first, in-case top/left are set even on static elem
     if (css(elem, 'position') === 'static') {
@@ -3087,7 +3087,7 @@ return /******/ (function(modules) { // webpackBootstrap
       // firefox chrome documentElement.scrollHeight< body.scrollHeight
       // ie standard mode : documentElement.scrollHeight> body.scrollHeight
       d.documentElement['scroll' + name],
-      // quirks : documentElement.scrollHeight æœ€å¤§ç­‰äºŽå¯è§†çª—å£å¤šä¸€ç‚¹ï¼Ÿ
+      // quirks : documentElement.scrollHeight 最大等于可视窗口多一点？
       d.body['scroll' + name], domUtils['viewport' + name](d));
     };
 
@@ -3098,14 +3098,14 @@ return /******/ (function(modules) { // webpackBootstrap
       var body = doc.body;
       var documentElement = doc.documentElement;
       var documentElementProp = documentElement[prop];
-      // æ ‡å‡†æ¨¡å¼å– documentElement
-      // backcompat å– body
+      // 标准模式取 documentElement
+      // backcompat 取 body
       return doc.compatMode === 'CSS1Compat' && documentElementProp || body && body[prop] || documentElementProp;
     };
   });
 
   /*
-   å¾—åˆ°å…ƒç´ çš„å¤§å°ä¿¡æ¯
+   得到元素的大小信息
    @param elem
    @param name
    @param {String} [extra]  'padding' : (css width) + padding
@@ -3458,7 +3458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
       if (combobox) {
         notFoundContent = null;
-        // children å¸¦ dom ç»“æž„æ—¶ï¼Œæ— æ³•å¡«å…¥è¾“å…¥æ¡†
+        // children 带 dom 结构时，无法填入输入框
         optionLabelProp = optionLabelProp || 'value';
       }
 
@@ -4920,14 +4920,14 @@ return /******/ (function(modules) { // webpackBootstrap
       };
 
       _this.onPopupAlign = function (domNode, align) {
-        // å½“å‰è¿”å›žçš„ä½ç½®
+        // 当前返回的位置
         var placement = Object.keys(placements).filter(function (key) {
           return placements[key].points[0] === align.points[0] && placements[key].points[1] === align.points[1];
         })[0];
         if (!placement) {
           return;
         }
-        // æ ¹æ®å½“å‰åæ ‡è®¾ç½®åŠ¨ç”»ç‚¹
+        // 根据当前坐标设置动画点
         var rect = domNode.getBoundingClientRect();
         var transformOrigin = {
           top: '50%',
@@ -4956,7 +4956,7 @@ return /******/ (function(modules) { // webpackBootstrap
       return this.refs.tooltip.getPopupDomNode();
     };
 
-    // åŠ¨æ€è®¾ç½®åŠ¨ç”»ç‚¹
+    // 动态设置动画点
 
 
     Tooltip.prototype.render = function render() {
@@ -5868,17 +5868,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-  // ç»Ÿä¸€åˆå¹¶ä¸ºå®Œæ•´çš„ Locale
+  // 统一合并为完整的 Locale
   var locale = _extends({}, _zh_CN2["default"]);
   locale.lang = _extends({
-    placeholder: 'è¯·é€‰æ‹©æ—¥æœŸ',
-    rangePlaceholder: ['å¼€å§‹æ—¥æœŸ', 'ç»“æŸæ—¥æœŸ']
+    placeholder: '请选择日期',
+    rangePlaceholder: ['开始日期', '结束日期']
   }, _zh_CN4["default"]);
 
   locale.timePickerLocale = _extends({}, _zh_CN6["default"]);
 
   // should add whitespace between char in Button
-  locale.lang.ok = 'ç¡® å®š';
+  locale.lang.ok = '确 定';
 
   // All settings at:
   // https://github.com/ant-design/ant-design/issues/424
@@ -6084,15 +6084,15 @@ return /******/ (function(modules) { // webpackBootstrap
       if (mousePositionEventBinded) {
         return;
       }
-      // åªæœ‰ç‚¹å‡»äº‹ä»¶æ”¯æŒä»Žé¼ æ ‡ä½ç½®åŠ¨ç”»å±•å¼€
+      // 只有点击事件支持从鼠标位置动画展开
       (0, _addEventListener2["default"])(document.documentElement, 'click', function (e) {
         mousePosition = {
           x: e.pageX,
           y: e.pageY
         };
-        // 20ms å†…å‘ç”Ÿè¿‡ç‚¹å‡»äº‹ä»¶ï¼Œåˆ™ä»Žç‚¹å‡»ä½ç½®åŠ¨ç”»å±•ç¤º
-        // å¦åˆ™ç›´æŽ¥ zoom å±•ç¤º
-        // è¿™æ ·å¯ä»¥å…¼å®¹éžç‚¹å‡»æ–¹å¼å±•å¼€
+        // 20ms 内发生过点击事件，则从点击位置动画展示
+        // 否则直接 zoom 展示
+        // 这样可以兼容非点击方式展开
         setTimeout(function () {
           return mousePosition = null;
         }, 20);
@@ -6118,7 +6118,7 @@ return /******/ (function(modules) { // webpackBootstrap
           size: 'large',
           onClick: this.handleCancel
         },
-        cancelText || 'å–æ¶ˆ'
+        cancelText || '取消'
       ), _react2["default"].createElement(
         _button2["default"],
         { key: 'confirm',
@@ -6127,7 +6127,7 @@ return /******/ (function(modules) { // webpackBootstrap
           loading: props.confirmLoading,
           onClick: this.handleOk
         },
-        okText || 'ç¡®å®š'
+        okText || '确定'
       )];
       var footer = props.footer || defaultFooter;
       return _react2["default"].createElement(_rcDialog2["default"], _extends({ onClose: this.handleCancel, footer: footer }, props, {
@@ -6179,9 +6179,9 @@ return /******/ (function(modules) { // webpackBootstrap
   exports.changeConfirmLocale = changeConfirmLocale;
   exports.getConfirmLocale = getConfirmLocale;
   var defaultLocale = {
-    okText: 'ç¡®å®š',
-    cancelText: 'å–æ¶ˆ',
-    justOkText: 'çŸ¥é“äº†'
+    okText: '确定',
+    cancelText: '取消',
+    justOkText: '知道了'
   };
 
   var runtimeLocale = _extends({}, defaultLocale);
@@ -6462,7 +6462,7 @@ return /******/ (function(modules) { // webpackBootstrap
         _react2["default"].createElement(
           'div',
           { className: prefixCls + '-text' },
-          tip || 'åŠ è½½ä¸­...'
+          tip || '加载中...'
         )
       );
 
@@ -6513,7 +6513,7 @@ return /******/ (function(modules) { // webpackBootstrap
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
   var locale = _extends({
-    placeholder: 'è¯·é€‰æ‹©æ—¶é—´'
+    placeholder: '请选择时间'
   }, _zh_CN2["default"]);
 
   exports["default"] = locale;
@@ -6931,15 +6931,15 @@ return /******/ (function(modules) { // webpackBootstrap
   var _utils2 = _interopRequireDefault(_utils);
 
   /**
-   * å¾—åˆ°ä¼šå¯¼è‡´å…ƒç´ æ˜¾ç¤ºä¸å…¨çš„ç¥–å…ˆå…ƒç´
+   * 得到会导致元素显示不全的祖先元素
    */
 
   function getOffsetParent(element) {
-    // ie è¿™ä¸ªä¹Ÿä¸æ˜¯å®Œå…¨å¯è¡Œ
+    // ie 这个也不是完全可行
     /*
      <div style="width: 50px;height: 100px;overflow: hidden">
      <div style="width: 50px;height: 100px;position: relative;" id="d6">
-     å…ƒç´  6 é«˜ 100px å®½ 50px<br/>
+     元素 6 高 100px 宽 50px<br/>
      </div>
      </div>
      */
@@ -6949,7 +6949,7 @@ return /******/ (function(modules) { // webpackBootstrap
     //        if (UA.ie && ieMode < 8) {
     //            return element.offsetParent;
     //        }
-    // ç»Ÿä¸€çš„ offsetParent æ–¹æ³•
+    // 统一的 offsetParent 方法
     var doc = element.ownerDocument;
     var body = doc.body;
     var parent = undefined;
@@ -7019,15 +7019,15 @@ return /******/ (function(modules) { // webpackBootstrap
   'use strict';
 
   module.exports = {
-    eras: ['å…¬å…ƒå‰', 'å…¬å…ƒ'],
-    months: ['ä¸€æœˆ', 'äºŒæœˆ', 'ä¸‰æœˆ', 'å››æœˆ', 'äº”æœˆ', 'å…­æœˆ', 'ä¸ƒæœˆ', 'å…«æœˆ', 'ä¹æœˆ', 'åæœˆ', 'åä¸€æœˆ', 'åäºŒæœˆ'],
-    shortMonths: ['ä¸€æœˆ', 'äºŒæœˆ', 'ä¸‰æœˆ', 'å››æœˆ', 'äº”æœˆ', 'å…­æœˆ', 'ä¸ƒæœˆ', 'å…«æœˆ', 'ä¹æœˆ', 'åæœˆ', 'åä¸€æœˆ', 'åäºŒæœˆ'],
-    weekdays: ['æ˜ŸæœŸå¤©', 'æ˜ŸæœŸä¸€', 'æ˜ŸæœŸäºŒ', 'æ˜ŸæœŸä¸‰', 'æ˜ŸæœŸå››', 'æ˜ŸæœŸäº”', 'æ˜ŸæœŸå…­'],
-    shortWeekdays: ['å‘¨æ—¥', 'å‘¨ä¸€', 'å‘¨äºŒ', 'å‘¨ä¸‰', 'å‘¨å››', 'å‘¨äº”', 'å‘¨å…­'],
-    veryShortWeekdays: ['æ—¥', 'ä¸€', 'äºŒ', 'ä¸‰', 'å››', 'äº”', 'å…­'],
-    ampms: ['ä¸Šåˆ', 'ä¸‹åˆ'],
-    datePatterns: ['yyyy\'å¹´\'M\'æœˆ\'d\'æ—¥\' EEEE', 'yyyy\'å¹´\'M\'æœˆ\'d\'æ—¥\'', 'yyyy-M-d', 'yy-M-d'],
-    timePatterns: ['ahh\'æ—¶\'mm\'åˆ†\'ss\'ç§’\' \'GMT\'Z', 'ahh\'æ—¶\'mm\'åˆ†\'ss\'ç§’\'', 'H:mm:ss', 'ah:mm'],
+    eras: ['公元前', '公元'],
+    months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+    shortMonths: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+    weekdays: ['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+    shortWeekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+    veryShortWeekdays: ['日', '一', '二', '三', '四', '五', '六'],
+    ampms: ['上午', '下午'],
+    datePatterns: ['yyyy\'年\'M\'月\'d\'日\' EEEE', 'yyyy\'年\'M\'月\'d\'日\'', 'yyyy-M-d', 'yy-M-d'],
+    timePatterns: ['ahh\'时\'mm\'分\'ss\'秒\' \'GMT\'Z', 'ahh\'时\'mm\'分\'ss\'秒\'', 'H:mm:ss', 'ah:mm'],
     dateTimePattern: '{date} {time}'
   };
 
@@ -7802,7 +7802,7 @@ return /******/ (function(modules) { // webpackBootstrap
               onClick: this.previousYear,
               title: locale.previousYear
             },
-            'Â«'
+            '«'
           )),
           this.showIf(enablePrev, _react2["default"].createElement(
             'a',
@@ -7812,7 +7812,7 @@ return /******/ (function(modules) { // webpackBootstrap
               onClick: this.previousMonth,
               title: locale.previousMonth
             },
-            'â€¹'
+            '‹'
           )),
           this.getMonthYearElement(),
           this.showIf(enableNext, _react2["default"].createElement(
@@ -7822,7 +7822,7 @@ return /******/ (function(modules) { // webpackBootstrap
               onClick: this.nextMonth,
               title: locale.nextMonth
             },
-            'â€º'
+            '›'
           )),
           this.showIf(enableNext, _react2["default"].createElement(
             'a',
@@ -7831,7 +7831,7 @@ return /******/ (function(modules) { // webpackBootstrap
               onClick: this.nextYear,
               title: locale.nextYear
             },
-            'Â»'
+            '»'
           ))
         ),
         panel
@@ -8166,27 +8166,27 @@ return /******/ (function(modules) { // webpackBootstrap
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
   exports["default"] = {
-    today: 'ä»Šå¤©',
-    now: 'æ­¤åˆ»',
-    backToToday: 'è¿”å›žä»Šå¤©',
-    ok: 'ç¡®å®š',
-    clear: 'æ¸…é™¤',
-    month: 'æœˆ',
-    year: 'å¹´',
-    previousMonth: 'ä¸Šä¸ªæœˆ (ç¿»é¡µä¸Šé”®)',
-    nextMonth: 'ä¸‹ä¸ªæœˆ (ç¿»é¡µä¸‹é”®)',
-    monthSelect: 'é€‰æ‹©æœˆä»½',
-    yearSelect: 'é€‰æ‹©å¹´ä»½',
-    decadeSelect: 'é€‰æ‹©å¹´ä»£',
-    yearFormat: 'yyyy\'å¹´\'',
-    monthFormat: 'M\'æœˆ\'',
-    dateFormat: 'yyyy\'å¹´\'M\'æœˆ\'d\'æ—¥\'',
-    previousYear: 'ä¸Šä¸€å¹´ (Controlé”®åŠ å·¦æ–¹å‘é”®)',
-    nextYear: 'ä¸‹ä¸€å¹´ (Controlé”®åŠ å³æ–¹å‘é”®)',
-    previousDecade: 'ä¸Šä¸€å¹´ä»£',
-    nextDecade: 'ä¸‹ä¸€å¹´ä»£',
-    previousCentury: 'ä¸Šä¸€ä¸–çºª',
-    nextCentury: 'ä¸‹ä¸€ä¸–çºª',
+    today: '今天',
+    now: '此刻',
+    backToToday: '返回今天',
+    ok: '确定',
+    clear: '清除',
+    month: '月',
+    year: '年',
+    previousMonth: '上个月 (翻页上键)',
+    nextMonth: '下个月 (翻页下键)',
+    monthSelect: '选择月份',
+    yearSelect: '选择年份',
+    decadeSelect: '选择年代',
+    yearFormat: 'yyyy\'年\'',
+    monthFormat: 'M\'月\'',
+    dateFormat: 'yyyy\'年\'M\'月\'d\'日\'',
+    previousYear: '上一年 (Control键加左方向键)',
+    nextYear: '下一年 (Control键加右方向键)',
+    previousDecade: '上一年代',
+    nextDecade: '下一年代',
+    previousCentury: '上一世纪',
+    nextCentury: '下一世纪',
     format: _zh_CN2["default"]
   };
   module.exports = exports['default'];
@@ -8313,7 +8313,7 @@ return /******/ (function(modules) { // webpackBootstrap
                 onClick: this.previousYear,
                 title: locale.previousYear
               },
-              'Â«'
+              '«'
             ),
             _react2["default"].createElement(
               'a',
@@ -8342,7 +8342,7 @@ return /******/ (function(modules) { // webpackBootstrap
                 onClick: this.nextYear,
                 title: locale.nextYear
               },
-              'Â»'
+              '»'
             )
           ),
           _react2["default"].createElement(
@@ -8741,7 +8741,7 @@ return /******/ (function(modules) { // webpackBootstrap
                 onClick: this.previousDecade,
                 title: locale.previousDecade
               },
-              'Â«'
+              '«'
             ),
             _react2["default"].createElement(
               'a',
@@ -8772,7 +8772,7 @@ return /******/ (function(modules) { // webpackBootstrap
                 onClick: this.nextDecade,
                 title: locale.nextDecade
               },
-              'Â»'
+              '»'
             )
           ),
           _react2["default"].createElement(
@@ -10013,19 +10013,19 @@ return /******/ (function(modules) { // webpackBootstrap
   });
   exports['default'] = {
     // Options.jsx
-    items_per_page: 'æ¡/é¡µ',
-    jump_to: 'è·³è‡³',
-    page: 'é¡µ',
+    items_per_page: '条/页',
+    jump_to: '跳至',
+    page: '页',
 
     // Pager.jsx
-    first_page: 'ç¬¬ä¸€é¡µ',
-    last_page: 'æœ€åŽä¸€é¡µ',
+    first_page: '第一页',
+    last_page: '最后一页',
 
     // Pagination.jsx
-    prev_page: 'ä¸Šä¸€é¡µ',
-    next_page: 'ä¸‹ä¸€é¡µ',
-    prev_5: 'å‘å‰ 5 é¡µ',
-    next_5: 'å‘åŽ 5 é¡µ'
+    prev_page: '上一页',
+    next_page: '下一页',
+    prev_5: '向前 5 页',
+    next_5: '向后 5 页'
   };
   module.exports = exports['default'];
 
@@ -10716,8 +10716,8 @@ return /******/ (function(modules) { // webpackBootstrap
         if (item.pos === nodePos ||
           nArr.length > iArr.length && isInclude(iArr, nArr) ||
           nArr.length < iArr.length && isInclude(nArr, iArr)) {
-          // è¿‡æ»¤æŽ‰ çˆ¶çº§èŠ‚ç‚¹ å’Œ æ‰€æœ‰å­èŠ‚ç‚¹ã€‚
-          // å› ä¸º nodeèŠ‚ç‚¹ ä¸é€‰æ—¶ï¼Œå…¶ çˆ¶çº§èŠ‚ç‚¹ å’Œ æ‰€æœ‰å­èŠ‚ç‚¹ éƒ½ä¸é€‰ã€‚
+          // 过滤掉 父级节点 和 所有子节点。
+          // 因为 node节点 不选时，其 父级节点 和 所有子节点 都不选。
           return;
         }
         newCks.push(item.key);
@@ -10796,7 +10796,7 @@ return /******/ (function(modules) { // webpackBootstrap
       return b - a;
     });
     // const s = Date.now();
-    // todo: æ•°æ®é‡å¤§æ—¶ï¼Œä¸‹è¾¹å‡½æ•°æ€§èƒ½å·®ï¼Œèƒ½å¦æ˜¯o1æ—¶é—´å¤æ‚åº¦ï¼Ÿ
+    // todo: 数据量大时，下边函数性能差，能否是o1时间复杂度？
     levelArr.reduce(function (pre, cur) {
       if (cur && cur !== pre) {
         levelObj[pre].forEach(function (item) {
@@ -10879,7 +10879,7 @@ return /******/ (function(modules) { // webpackBootstrap
     return pos.split('-');
   }
 
-  // TODO å†ä¼˜åŒ–
+  // TODO 再优化
 
   function handleCheckState(obj, checkedPositionArr, checkIt) {
     // console.log(stripTail('0-101-000'));
@@ -10890,7 +10890,7 @@ return /******/ (function(modules) { // webpackBootstrap
       var iArr = splitPosition(i);
       var saved = false;
       checkedPositionArr.forEach(function (_pos) {
-        // è®¾ç½®å­èŠ‚ç‚¹ï¼Œå…¨é€‰æˆ–å…¨ä¸é€‰
+        // 设置子节点，全选或全不选
         var _posArr = splitPosition(_pos);
         if (iArr.length > _posArr.length && isInclude(_posArr, iArr)) {
           obj[i].halfChecked = false;
@@ -10898,7 +10898,7 @@ return /******/ (function(modules) { // webpackBootstrap
           objKeys[index] = null;
         }
         if (iArr[0] === _posArr[0] && iArr[1] === _posArr[1]) {
-          // å¦‚æžœ
+          // 如果
           saved = true;
         }
       });
@@ -10911,7 +10911,7 @@ return /******/ (function(modules) { // webpackBootstrap
     }); // filter non null;
 
     var _loop3 = function (_pIndex) {
-      // å¾ªçŽ¯è®¾ç½®çˆ¶èŠ‚ç‚¹çš„ é€‰ä¸­ æˆ– åŠé€‰çŠ¶æ€
+      // 循环设置父节点的 选中 或 半选状态
       var loop = function loop(__pos) {
         var _posLen = splitPosition(__pos).length;
         if (_posLen <= 2) {
@@ -10942,8 +10942,8 @@ return /******/ (function(modules) { // webpackBootstrap
         });
         // objKeys = objKeys.filter(i => i); // filter non null;
         var parent = obj[parentPosition];
-        // sibling ä¸ä¼šç­‰äºŽ0
-        // å…¨ä¸é€‰ - å…¨é€‰ - åŠé€‰
+        // sibling 不会等于0
+        // 全不选 - 全选 - 半选
         if (siblingChecked === 0) {
           parent.checked = false;
           parent.halfChecked = false;
@@ -11007,7 +11007,7 @@ return /******/ (function(modules) { // webpackBootstrap
     return getCheck(treeNodesStates, checkedPositions);
   }
 
-  // ç»™æ¯ä¸€ä¸ª children èŠ‚ç‚¹ï¼Œå¢žåŠ  prop
+  // 给每一个 children 节点，增加 prop
 
   function recursiveCloneChildren(children) {
     var cb = arguments.length <= 1 || arguments[1] === undefined ? function (ch) {
@@ -11061,9 +11061,9 @@ return /******/ (function(modules) { // webpackBootstrap
     });
   }
 
-  // ç”¨äºŽæ ¹æ®é€‰æ‹©æ¡†é‡Œçš„ value ç­›é€‰åˆå§‹çš„ tree æ•°æ®é‡Œå…¨éƒ¨é€‰ä¸­é¡¹ã€‚
-  // è§„åˆ™æ˜¯ï¼šæŸä¸€é¡¹é€‰ä¸­ï¼Œåˆ™å­é¡¹å…¨é€‰ä¸­ï¼›ç›¸é‚»èŠ‚ç‚¹å…¨é€‰ä¸­ï¼Œåˆ™çˆ¶èŠ‚ç‚¹é€‰ä¸­ã€‚
-  // ä¸Ž handleCheckState éƒ¨åˆ†åŠŸèƒ½é‡åˆï¼ŒTODOï¼šä¼˜åŒ–åˆå¹¶èµ·æ¥ã€‚
+  // 用于根据选择框里的 value 筛选初始的 tree 数据里全部选中项。
+  // 规则是：某一项选中，则子项全选中；相邻节点全选中，则父节点选中。
+  // 与 handleCheckState 部分功能重合，TODO：优化合并起来。
 
   function filterAllCheckedData(vs, treeNodes) {
     var vals = [].concat(_toConsumableArray(vs));
@@ -11134,10 +11134,10 @@ return /******/ (function(modules) { // webpackBootstrap
     checkParent(data);
 
     checkedNodesPositions.forEach(function (i, index) {
-      // æ¸…ç†æŽ‰ç§æœ‰æ•°æ®
+      // 清理掉私有数据
       delete checkedNodesPositions[index].node.__checked;
       delete checkedNodesPositions[index].node._pos;
-      // å°è£…å‡º props å’Œ onCheck è¿”å›žå€¼ä¸€è‡´
+      // 封装出 props 和 onCheck 返回值一致
       checkedNodesPositions[index].node.props = {
         title: checkedNodesPositions[index].node.title,
         label: checkedNodesPositions[index].node.label || checkedNodesPositions[index].node.title,
@@ -11416,7 +11416,7 @@ return /******/ (function(modules) { // webpackBootstrap
       var iArr = splitPosition(i);
       var saved = false;
       checkedPositionArr.forEach(function (_pos) {
-        // è®¾ç½®å­èŠ‚ç‚¹ï¼Œå…¨é€‰æˆ–å…¨ä¸é€‰
+        // 设置子节点，全选或全不选
         var _posArr = splitPosition(_pos);
         if (iArr.length > _posArr.length && isInclude(_posArr, iArr)) {
           obj[i].halfChecked = false;
@@ -11424,7 +11424,7 @@ return /******/ (function(modules) { // webpackBootstrap
           objKeys[index] = null;
         }
         if (iArr[0] === _posArr[0] && iArr[1] === _posArr[1]) {
-          // å¦‚æžœ
+          // 如果
           saved = true;
         }
       });
@@ -11432,14 +11432,14 @@ return /******/ (function(modules) { // webpackBootstrap
         objKeys[index] = null;
       }
     });
-    // TODO: å¾ªçŽ¯ 2470000 æ¬¡è€—æ—¶çº¦ 1400 msã€‚ æ€§èƒ½ç“¶é¢ˆï¼
+    // TODO: 循环 2470000 次耗时约 1400 ms。 性能瓶颈！
     // console.log(Date.now()-s, checkedPositionArr.length * objKeys.length);
     objKeys = objKeys.filter(function (i) {
       return i;
     }); // filter non null;
 
     var _loop3 = function (_pIndex) {
-      // å¾ªçŽ¯è®¾ç½®çˆ¶èŠ‚ç‚¹çš„ é€‰ä¸­ æˆ– åŠé€‰çŠ¶æ€
+      // 循环设置父节点的 选中 或 半选状态
       var loop = function loop(__pos) {
         var _posLen = splitPosition(__pos).length;
         if (_posLen <= 2) {
@@ -11470,8 +11470,8 @@ return /******/ (function(modules) { // webpackBootstrap
         });
         // objKeys = objKeys.filter(i => i); // filter non null;
         var parent = obj[parentPosition];
-        // sibling ä¸ä¼šç­‰äºŽ0
-        // å…¨ä¸é€‰ - å…¨é€‰ - åŠé€‰
+        // sibling 不会等于0
+        // 全不选 - 全选 - 半选
         if (siblingChecked === 0) {
           parent.checked = false;
           parent.halfChecked = false;
@@ -12534,7 +12534,7 @@ return /******/ (function(modules) { // webpackBootstrap
         deltaX = -1 * wheelDeltaX / 120;
       }
 
-      // é»˜è®¤ deltaY (ie)
+      // 默认 deltaY (ie)
       if (!deltaX && !deltaY) {
         deltaY = delta;
       }
@@ -14237,7 +14237,7 @@ return /******/ (function(modules) { // webpackBootstrap
         var dom = _reactDom2["default"].findDOMNode(_this);
         dom.style.height = dom.offsetHeight + 'px';
         // Magic code
-        // é‡å¤ä¸€æ¬¡åŽæ‰èƒ½æ­£ç¡®è®¾ç½® height
+        // 重复一次后才能正确设置 height
         dom.style.height = dom.offsetHeight + 'px';
 
         _this.setState({
@@ -14589,7 +14589,7 @@ return /******/ (function(modules) { // webpackBootstrap
       }
       var currentDigit = getNumberArray(this.state.count)[i];
       var lastDigit = getNumberArray(this.lastCount)[i];
-      // åŒæ–¹å‘åˆ™åœ¨åŒä¸€ä¾§åˆ‡æ¢æ•°å­—
+      // 同方向则在同一侧切换数字
       if (this.state.count > this.lastCount) {
         if (currentDigit >= lastDigit) {
           return 10 + num;
@@ -14610,12 +14610,12 @@ return /******/ (function(modules) { // webpackBootstrap
           return;
         }
         this.lastCount = this.state.count;
-        // å¤åŽŸæ•°å­—åˆå§‹ä½ç½®
+        // 复原数字初始位置
         this.setState({
           animateStarted: true
         }, function () {
-          // ç­‰å¾…æ•°å­—ä½ç½®å¤åŽŸå®Œæ¯•
-          // å¼€å§‹è®¾ç½®å®Œæ•´çš„æ•°å­—
+          // 等待数字位置复原完毕
+          // 开始设置完整的数字
           setTimeout(function () {
             _this2.setState({
               animateStarted: false,
@@ -15292,7 +15292,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
       var start = year - yearSelectOffset;
       var end = start + yearSelectTotal;
-      var suffix = locale.year === 'å¹´' ? 'å¹´' : '';
+      var suffix = locale.year === '年' ? '年' : '';
 
       var options = [];
       for (var index = start; index < end; index++) {
@@ -15563,7 +15563,7 @@ return /******/ (function(modules) { // webpackBootstrap
       if (context && context.antLocale && context.antLocale.Calendar) {
         locale = context.antLocale.Calendar;
       }
-      // ç»Ÿä¸€åˆå¹¶ä¸ºå®Œæ•´çš„ Locale
+      // 统一合并为完整的 Locale
       var result = _extends({}, locale, props.locale);
       result.lang = _extends({}, locale.lang, props.locale.lang);
       return result;
@@ -15697,27 +15697,27 @@ return /******/ (function(modules) { // webpackBootstrap
         _react2["default"].createElement(
           'p',
           null,
-          'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ'
+          '████████████████████████'
         ),
         _react2["default"].createElement(
           'p',
           null,
-          'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆã€€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ'
+          '██████　███████████████████'
         ),
         _react2["default"].createElement(
           'p',
           null,
-          'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆã€€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ'
+          '██████████████　██████████'
         ),
         _react2["default"].createElement(
           'p',
           null,
-          'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆã€€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆã€€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ'
+          '█████　██████　█████████████'
         ),
         _react2["default"].createElement(
           'p',
           null,
-          'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆã€€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆã€€â–ˆâ–ˆâ–ˆ'
+          '███████████　██████████　███'
         )
       );
     }
@@ -16412,9 +16412,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
       var props = this.props;
       var locale = props.locale;
-      // ä»¥ä¸‹ä¸¤è¡Œä»£ç 
-      // ç»™æ²¡æœ‰åˆå§‹å€¼çš„æ—¥æœŸé€‰æ‹©æ¡†æä¾›æœ¬åœ°åŒ–ä¿¡æ¯
-      // å¦åˆ™ä¼šä»¥å‘¨æ—¥å¼€å§‹æŽ’
+      // 以下两行代码
+      // 给没有初始值的日期选择框提供本地化信息
+      // 否则会以周日开始排
       var defaultCalendarValue = new _gregorianCalendar2["default"](locale);
       defaultCalendarValue.setTime(Date.now());
 
@@ -16633,9 +16633,9 @@ return /******/ (function(modules) { // webpackBootstrap
       CalenderWrapper.prototype.render = function render() {
         var props = this.props;
         var locale = props.locale;
-        // ä»¥ä¸‹ä¸¤è¡Œä»£ç 
-        // ç»™æ²¡æœ‰åˆå§‹å€¼çš„æ—¥æœŸé€‰æ‹©æ¡†æä¾›æœ¬åœ°åŒ–ä¿¡æ¯
-        // å¦åˆ™ä¼šä»¥å‘¨æ—¥å¼€å§‹æŽ’
+        // 以下两行代码
+        // 给没有初始值的日期选择框提供本地化信息
+        // 否则会以周日开始排
         var defaultCalendarValue = new _gregorianCalendar2["default"](locale);
         defaultCalendarValue.setTime(Date.now());
 
@@ -16885,7 +16885,7 @@ return /******/ (function(modules) { // webpackBootstrap
         if (context.antLocale && context.antLocale.DatePicker) {
           locale = context.antLocale.DatePicker;
         }
-        // ç»Ÿä¸€åˆå¹¶ä¸ºå®Œæ•´çš„ Locale
+        // 统一合并为完整的 Locale
         var result = _extends({}, locale, props.locale);
         result.lang = _extends({}, locale.lang, props.locale.lang);
         return result;
@@ -17361,7 +17361,7 @@ return /******/ (function(modules) { // webpackBootstrap
       // remove user input colon
       var label = props.label;
       if (typeof label === 'string' && label.trim() !== '') {
-        label = props.label.replace(/[ï¼š|:]\s*$/, '');
+        label = props.label.replace(/[：|:]\s*$/, '');
       }
 
       return props.label ? _react2["default"].createElement(
@@ -18358,9 +18358,9 @@ return /******/ (function(modules) { // webpackBootstrap
       var props = {};
       var className = this.props.className + ' ' + this.props.prefixCls + '-' + this.props.theme;
       if (this.props.mode !== 'inline') {
-        // è¿™ç»„å±žæ€§çš„ç›®çš„æ˜¯
-        // å¼¹å‡ºåž‹çš„èœå•éœ€è¦ç‚¹å‡»åŽç«‹å³å…³é—­
-        // å¦å¤–ï¼Œå¼¹å‡ºåž‹çš„èœå•çš„å—æŽ§æ¨¡å¼æ²¡æœ‰ä½¿ç”¨åœºæ™¯
+        // 这组属性的目的是
+        // 弹出型的菜单需要点击后立即关闭
+        // 另外，弹出型的菜单的受控模式没有使用场景
         props = {
           openKeys: this.state.openKeys,
           onClick: this.handleClick,
@@ -18567,7 +18567,7 @@ return /******/ (function(modules) { // webpackBootstrap
     var width = props.width || 416;
     var style = props.style || {};
 
-    // é»˜è®¤ä¸º trueï¼Œä¿æŒå‘ä¸‹å…¼å®¹
+    // 默认为 true，保持向下兼容
     if (!('okCancel' in props)) {
       props.okCancel = true;
     }
@@ -19192,12 +19192,12 @@ return /******/ (function(modules) { // webpackBootstrap
             _react2["default"].createElement(
               _button2["default"],
               { onClick: this.cancel, type: 'ghost', size: 'small' },
-              cancelText || 'å–æ¶ˆ'
+              cancelText || '取消'
             ),
             _react2["default"].createElement(
               _button2["default"],
               { onClick: this.confirm, type: 'primary', size: 'small' },
-              okText || 'ç¡®å®š'
+              okText || '确定'
             )
           )
         )
@@ -19855,12 +19855,12 @@ return /******/ (function(modules) { // webpackBootstrap
       var rest = _objectWithoutProperties(_props, ['isIncluded', 'marks', 'index', 'defaultIndex']);
 
       if (isIncluded !== undefined) {
-        // å…¼å®¹ `isIncluded`
+        // 兼容 `isIncluded`
         rest.included = isIncluded;
       }
 
       if (Array.isArray(marks)) {
-        // å…¼å®¹å½“ marks ä¸ºæ•°ç»„çš„æƒ…å†µ
+        // 兼容当 marks 为数组的情况
         rest.min = 0;
         rest.max = marks.length - 1;
         rest.step = 1;
@@ -20114,14 +20114,14 @@ return /******/ (function(modules) { // webpackBootstrap
   }
 
   var defaultLocale = {
-    filterTitle: 'ç­›é€‰',
-    filterConfirm: 'ç¡®å®š',
-    filterReset: 'é‡ç½®',
+    filterTitle: '筛选',
+    filterConfirm: '确定',
+    filterReset: '重置',
     emptyText: _react2["default"].createElement(
       'span',
       null,
       _react2["default"].createElement(_icon2["default"], { type: 'frown' }),
-      'æš‚æ— æ•°æ®'
+      '暂无数据'
     )
   };
 
@@ -20144,7 +20144,7 @@ return /******/ (function(modules) { // webpackBootstrap
       var pagination = props.pagination || {};
 
       _this.state = _extends({
-        // å‡å°‘çŠ¶æ€
+        // 减少状态
         selectedRowKeys: (props.rowSelection || {}).selectedRowKeys || [],
         filters: _this.getFiltersFromColumns(),
         selectionDirty: false
@@ -20207,7 +20207,7 @@ return /******/ (function(modules) { // webpackBootstrap
           return { pagination: newPagination };
         });
       }
-      // dataSource çš„å˜åŒ–ä¼šæ¸…ç©ºé€‰ä¸­é¡¹
+      // dataSource 的变化会清空选中项
       if ('dataSource' in nextProps && nextProps.dataSource !== this.props.dataSource) {
         this.setState({
           selectionDirty: false
@@ -20344,21 +20344,21 @@ return /******/ (function(modules) { // webpackBootstrap
       var _state2 = this.state;
       var sortColumn = _state2.sortColumn;
       var sortOrder = _state2.sortOrder;
-      // åªåŒæ—¶å…è®¸ä¸€åˆ—è¿›è¡ŒæŽ’åºï¼Œå¦åˆ™ä¼šå¯¼è‡´æŽ’åºé¡ºåºçš„é€»è¾‘é—®é¢˜
+      // 只同时允许一列进行排序，否则会导致排序顺序的逻辑问题
 
       var isSortColumn = this.isSortColumn(column);
       if (!isSortColumn) {
-        // å½“å‰åˆ—æœªæŽ’åº
+        // 当前列未排序
         sortOrder = order;
         sortColumn = column;
       } else {
-        // å½“å‰åˆ—å·²æŽ’åº
+        // 当前列已排序
         if (sortOrder === order) {
-          // åˆ‡æ¢ä¸ºæœªæŽ’åºçŠ¶æ€
+          // 切换为未排序状态
           sortOrder = '';
           sortColumn = null;
         } else {
-          // åˆ‡æ¢ä¸ºæŽ’åºçŠ¶æ€
+          // 切换为排序状态
           sortOrder = order;
         }
       }
@@ -20490,7 +20490,7 @@ return /******/ (function(modules) { // webpackBootstrap
             _react2["default"].createElement(
               'span',
               { className: 'ant-table-column-sorter-up ' + (isAscend ? 'on' : 'off'),
-                title: 'â†‘',
+                title: '↑',
                 onClick: function onClick() {
                   return _this8.toggleSortOrder('ascend', column);
                 }
@@ -20500,7 +20500,7 @@ return /******/ (function(modules) { // webpackBootstrap
             _react2["default"].createElement(
               'span',
               { className: 'ant-table-column-sorter-down ' + (isDescend ? 'on' : 'off'),
-                title: 'â†“',
+                title: '↓',
                 onClick: function onClick() {
                   return _this8.toggleSortOrder('descend', column);
                 }
@@ -20521,7 +20521,7 @@ return /******/ (function(modules) { // webpackBootstrap
     };
 
     Table.prototype.renderPagination = function renderPagination() {
-      // å¼ºåˆ¶ä¸éœ€è¦åˆ†é¡µ
+      // 强制不需要分页
       if (!this.hasPagination()) {
         return null;
       }
@@ -20542,7 +20542,7 @@ return /******/ (function(modules) { // webpackBootstrap
     };
 
     Table.prototype.prepareParamsArguments = function prepareParamsArguments(state) {
-      // å‡†å¤‡ç­›é€‰ã€æŽ’åºã€åˆ†é¡µçš„å‚æ•°
+      // 准备筛选、排序、分页的参数
       var pagination = state.pagination;
       var filters = state.filters;
       var sorter = {};
@@ -20568,7 +20568,7 @@ return /******/ (function(modules) { // webpackBootstrap
       var current = void 0;
       var pageSize = void 0;
       var state = this.state;
-      // å¦‚æžœæ²¡æœ‰åˆ†é¡µçš„è¯ï¼Œé»˜è®¤å…¨éƒ¨å±•ç¤º
+      // 如果没有分页的话，默认全部展示
       if (!this.hasPagination()) {
         pageSize = Number.MAX_VALUE;
         current = 1;
@@ -20576,10 +20576,10 @@ return /******/ (function(modules) { // webpackBootstrap
         pageSize = state.pagination.pageSize;
         current = state.pagination.current;
       }
-      // åˆ†é¡µ
+      // 分页
       // ---
-      // å½“æ•°æ®é‡å°‘äºŽç­‰äºŽæ¯é¡µæ•°é‡æ—¶ï¼Œç›´æŽ¥è®¾ç½®æ•°æ®
-      // å¦åˆ™è¿›è¡Œè¯»å–åˆ†é¡µæ•°æ®
+      // 当数据量少于等于每页数量时，直接设置数据
+      // 否则进行读取分页数据
       if (data.length > pageSize || pageSize === Number.MAX_VALUE) {
         data = data.filter(function (item, i) {
           return i >= (current - 1) * pageSize && i < current * pageSize;
@@ -20597,7 +20597,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
       var state = this.state;
       var data = this.props.dataSource || [];
-      // ä¼˜åŒ–æœ¬åœ°æŽ’åº
+      // 优化本地排序
       data = data.slice(0);
       for (var i = 0; i < data.length; i++) {
         data[i].indexForSort = i;
@@ -20606,7 +20606,7 @@ return /******/ (function(modules) { // webpackBootstrap
       if (sorterFn) {
         data = data.sort(sorterFn);
       }
-      // ç­›é€‰
+      // 筛选
       if (state.filters) {
         Object.keys(state.filters).forEach(function (columnKey) {
           var col = _this10.findColumn(columnKey);
@@ -20826,7 +20826,7 @@ return /******/ (function(modules) { // webpackBootstrap
         return _this12.getRecordKey(item, i);
       });
 
-      // è®°å½•å˜åŒ–çš„åˆ—
+      // 记录变化的列
       var changeRowKeys = [];
       if (checked) {
         changableRowKeys.forEach(function (key) {
@@ -20889,7 +20889,7 @@ return /******/ (function(modules) { // webpackBootstrap
     };
 
     this.renderSelectionRadio = function (value, record, index) {
-      var rowIndex = _this12.getRecordKey(record, index); // ä»Ž 1 å¼€å§‹
+      var rowIndex = _this12.getRecordKey(record, index); // 从 1 开始
       var props = _this12.getCheckboxPropsByItem(record);
       var checked = void 0;
       if (_this12.state.selectionDirty) {
@@ -20910,7 +20910,7 @@ return /******/ (function(modules) { // webpackBootstrap
     };
 
     this.renderSelectionCheckBox = function (value, record, index) {
-      var rowIndex = _this12.getRecordKey(record, index); // ä»Ž 1 å¼€å§‹
+      var rowIndex = _this12.getRecordKey(record, index); // 从 1 开始
       var checked = void 0;
       if (_this12.state.selectionDirty) {
         checked = _this12.state.selectedRowKeys.indexOf(rowIndex) >= 0;
@@ -21048,7 +21048,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
       _this.state = {
         selectedKeys: props.selectedKeys,
-        keyPathOfSelectedItem: {}, // è®°å½•æ‰€æœ‰æœ‰é€‰ä¸­å­èœå•çš„ç¥–å…ˆèœå•
+        keyPathOfSelectedItem: {}, // 记录所有有选中子菜单的祖先菜单
         visible: false
       };
       return _this;
@@ -21608,7 +21608,7 @@ return /******/ (function(modules) { // webpackBootstrap
     };
 
     /**
-     * èŽ·å¾—è¾“å…¥æ¡†çš„ className
+     * 获得输入框的 className
      */
 
 
@@ -21623,7 +21623,7 @@ return /******/ (function(modules) { // webpackBootstrap
     };
 
     /**
-     * èŽ·å¾—è¾“å…¥æ¡†çš„é»˜è®¤å€¼
+     * 获得输入框的默认值
      */
 
 
@@ -21648,7 +21648,7 @@ return /******/ (function(modules) { // webpackBootstrap
       if (this.context.antLocale && this.context.antLocale.TimePicker) {
         locale = this.context.antLocale.TimePicker;
       }
-      // ç»Ÿä¸€åˆå¹¶ä¸ºå®Œæ•´çš„ Locale
+      // 统一合并为完整的 Locale
       return _extends({}, locale, this.props.locale);
     };
 
@@ -22183,7 +22183,7 @@ return /******/ (function(modules) { // webpackBootstrap
     render: noop,
     targetKeys: [],
     onChange: noop,
-    titles: ['æºåˆ—è¡¨', 'ç›®çš„åˆ—è¡¨'],
+    titles: ['源列表', '目的列表'],
     operations: [],
     showSearch: false,
     body: noop,
@@ -22424,7 +22424,7 @@ return /******/ (function(modules) { // webpackBootstrap
         return !!item;
       });
 
-      var unit = 'æ¡';
+      var unit = '条';
       if (this.context.antLocale && this.context.antLocale.Transfer) {
         unit = dataSource.length > 1 ? this.context.antLocale.Transfer.itemsUnit : this.context.antLocale.Transfer.itemUnit;
         searchPlaceholder = searchPlaceholder || this.context.antLocale.Transfer.searchPlaceholder;
@@ -22469,7 +22469,7 @@ return /******/ (function(modules) { // webpackBootstrap
             _react2["default"].createElement(_search2["default"], { prefixCls: prefixCls + '-search',
               onChange: this.handleFilter,
               handleClear: this.handleClear,
-              placeholder: searchPlaceholder || 'è¯·è¾“å…¥æœç´¢å†…å®¹',
+              placeholder: searchPlaceholder || '请输入搜索内容',
               value: filter
             })
           ) : null,
@@ -22482,7 +22482,7 @@ return /******/ (function(modules) { // webpackBootstrap
             showItems.length > 0 ? showItems : _react2["default"].createElement(
               'div',
               { className: prefixCls + '-body-not-found' },
-              notFoundContent || 'åˆ—è¡¨ä¸ºç©º'
+              notFoundContent || '列表为空'
             )
           )
         ),
@@ -22930,7 +22930,7 @@ return /******/ (function(modules) { // webpackBootstrap
   }
 
   /**
-   * ç”ŸæˆProgress percent: 0.1 -> 0.98
+   * 生成Progress percent: 0.1 -> 0.98
    *   - for ie
    */
   function genPercentAdd() {
@@ -23000,7 +23000,7 @@ return /******/ (function(modules) { // webpackBootstrap
         } catch (e) {/* do nothing */}
         var fileList = _this.state.fileList;
         var targetItem = (0, _getFileItem2["default"])(file, fileList);
-        // ä¹‹å‰å·²ç»åˆ é™¤
+        // 之前已经删除
         if (targetItem) {
           targetItem.status = 'done';
           targetItem.response = response;
@@ -23341,7 +23341,7 @@ return /******/ (function(modules) { // webpackBootstrap
               icon = _react2["default"].createElement(
                 'div',
                 { className: prefixCls + '-list-item-uploading-text' },
-                'æ–‡ä»¶ä¸Šä¼ ä¸­'
+                '文件上传中'
               );
             } else {
               icon = _react2["default"].createElement(_icon2["default"], { className: prefixCls + '-list-item-thumbnail', type: 'picture' });
@@ -23682,7 +23682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
     // Right edge outside viewport, try to move it.
     if (overflow.adjustX && pos.left + size.width > visibleRect.right) {
-      // ä¿è¯å·¦è¾¹ç•Œå’Œå¯è§†åŒºåŸŸå·¦è¾¹ç•Œå¯¹é½
+      // 保证左边界和可视区域左边界对齐
       pos.left = Math.max(visibleRect.right - size.width, visibleRect.left);
     }
 
@@ -23698,7 +23698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
     // Bottom edge outside viewport, try to move it.
     if (overflow.adjustY && pos.top + size.height > visibleRect.bottom) {
-      // ä¿è¯ä¸Šè¾¹ç•Œå’Œå¯è§†åŒºåŸŸä¸Šè¾¹ç•Œå¯¹é½
+      // 保证上边界和可视区域上边界对齐
       pos.top = Math.max(visibleRect.bottom - size.height, visibleRect.top);
     }
 
@@ -23713,7 +23713,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
   /**
-   * èŽ·å– node ä¸Šçš„ align å¯¹é½ç‚¹ ç›¸å¯¹äºŽé¡µé¢çš„åæ ‡
+   * 获取 node 上的 align 对齐点 相对于页面的坐标
    */
 
   'use strict';
@@ -23856,7 +23856,7 @@ return /******/ (function(modules) { // webpackBootstrap
   var _getOffsetParent2 = _interopRequireDefault(_getOffsetParent);
 
   /**
-   * èŽ·å¾—å…ƒç´ çš„æ˜¾ç¤ºéƒ¨åˆ†çš„åŒºåŸŸ
+   * 获得元素的显示部分的区域
    */
   function getVisibleRectForElement(element) {
     var visibleRect = {
@@ -24018,31 +24018,31 @@ return /******/ (function(modules) { // webpackBootstrap
     var newOverflowCfg = {};
 
     var fail = 0;
-    // å½“å‰èŠ‚ç‚¹å¯ä»¥è¢«æ”¾ç½®çš„æ˜¾ç¤ºåŒºåŸŸ
+    // 当前节点可以被放置的显示区域
     var visibleRect = (0, _getVisibleRectForElement2['default'])(source);
-    // å½“å‰èŠ‚ç‚¹æ‰€å çš„åŒºåŸŸ, left/top/width/height
+    // 当前节点所占的区域, left/top/width/height
     var elRegion = (0, _getRegion2['default'])(source);
-    // å‚ç…§èŠ‚ç‚¹æ‰€å çš„åŒºåŸŸ, left/top/width/height
+    // 参照节点所占的区域, left/top/width/height
     var refNodeRegion = (0, _getRegion2['default'])(target);
-    // å°† offset è½¬æ¢æˆæ•°å€¼ï¼Œæ”¯æŒç™¾åˆ†æ¯”
+    // 将 offset 转换成数值，支持百分比
     normalizeOffset(offset, elRegion);
     normalizeOffset(targetOffset, refNodeRegion);
-    // å½“å‰èŠ‚ç‚¹å°†è¦è¢«æ”¾ç½®çš„ä½ç½®
+    // 当前节点将要被放置的位置
     var elFuturePos = (0, _getElFuturePos2['default'])(elRegion, refNodeRegion, points, offset, targetOffset);
-    // å½“å‰èŠ‚ç‚¹å°†è¦æ‰€å¤„çš„åŒºåŸŸ
+    // 当前节点将要所处的区域
     var newElRegion = _utils2['default'].merge(elRegion, elFuturePos);
 
-    // å¦‚æžœå¯è§†åŒºåŸŸä¸èƒ½å®Œå…¨æ”¾ç½®å½“å‰èŠ‚ç‚¹æ—¶å…è®¸è°ƒæ•´
+    // 如果可视区域不能完全放置当前节点时允许调整
     if (visibleRect && (overflow.adjustX || overflow.adjustY)) {
       if (overflow.adjustX) {
-        // å¦‚æžœæ¨ªå‘ä¸èƒ½æ”¾ä¸‹
+        // 如果横向不能放下
         if (isFailX(elFuturePos, elRegion, visibleRect)) {
-          // å¯¹é½ä½ç½®åä¸‹
+          // 对齐位置反下
           var newPoints = flip(points, /[lr]/ig, {
             l: 'r',
             r: 'l'
           });
-          // åç§»é‡ä¹Ÿåä¸‹
+          // 偏移量也反下
           var newOffset = flipOffset(offset, 0);
           var newTargetOffset = flipOffset(targetOffset, 0);
           var newElFuturePos = (0, _getElFuturePos2['default'])(elRegion, refNodeRegion, newPoints, newOffset, newTargetOffset);
@@ -24056,14 +24056,14 @@ return /******/ (function(modules) { // webpackBootstrap
       }
 
       if (overflow.adjustY) {
-        // å¦‚æžœçºµå‘ä¸èƒ½æ”¾ä¸‹
+        // 如果纵向不能放下
         if (isFailY(elFuturePos, elRegion, visibleRect)) {
-          // å¯¹é½ä½ç½®åä¸‹
+          // 对齐位置反下
           var newPoints = flip(points, /[tb]/ig, {
             t: 'b',
             b: 't'
           });
-          // åç§»é‡ä¹Ÿåä¸‹
+          // 偏移量也反下
           var newOffset = flipOffset(offset, 1);
           var newTargetOffset = flipOffset(targetOffset, 1);
           var newElFuturePos = (0, _getElFuturePos2['default'])(elRegion, refNodeRegion, newPoints, newOffset, newTargetOffset);
@@ -24076,19 +24076,19 @@ return /******/ (function(modules) { // webpackBootstrap
         }
       }
 
-      // å¦‚æžœå¤±è´¥ï¼Œé‡æ–°è®¡ç®—å½“å‰èŠ‚ç‚¹å°†è¦è¢«æ”¾ç½®çš„ä½ç½®
+      // 如果失败，重新计算当前节点将要被放置的位置
       if (fail) {
         elFuturePos = (0, _getElFuturePos2['default'])(elRegion, refNodeRegion, points, offset, targetOffset);
         _utils2['default'].mix(newElRegion, elFuturePos);
       }
 
-      // æ£€æŸ¥åä¸‹åŽçš„ä½ç½®æ˜¯å¦å¯ä»¥æ”¾ä¸‹äº†
-      // å¦‚æžœä»ç„¶æ”¾ä¸ä¸‹åªæœ‰æŒ‡å®šäº†å¯ä»¥è°ƒæ•´å½“å‰æ–¹å‘æ‰è°ƒæ•´
+      // 检查反下后的位置是否可以放下了
+      // 如果仍然放不下只有指定了可以调整当前方向才调整
       newOverflowCfg.adjustX = overflow.adjustX && isFailX(elFuturePos, elRegion, visibleRect);
 
       newOverflowCfg.adjustY = overflow.adjustY && isFailY(elFuturePos, elRegion, visibleRect);
 
-      // ç¡®å®žè¦è°ƒæ•´ï¼Œç”šè‡³å¯èƒ½ä¼šè°ƒæ•´é«˜åº¦å®½åº¦
+      // 确实要调整，甚至可能会调整高度宽度
       if (newOverflowCfg.adjustX || newOverflowCfg.adjustY) {
         newElRegion = (0, _adjustForViewport2['default'])(elFuturePos, elRegion, visibleRect, newOverflowCfg);
       }
@@ -24105,8 +24105,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
     // https://github.com/kissyteam/kissy/issues/190
     // http://localhost:8888/kissy/src/overlay/demo/other/relative_align/align.html
-    // ç›¸å¯¹äºŽå±å¹•ä½ç½®æ²¡å˜ï¼Œè€Œ left/top å˜äº†
-    // ä¾‹å¦‚ <div 'relative'><el absolute></div>
+    // 相对于屏幕位置没变，而 left/top 变了
+    // 例如 <div 'relative'><el absolute></div>
     _utils2['default'].offset(source, {
       left: newElRegion.left,
       top: newElRegion.top
@@ -24131,11 +24131,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
   /**
    *  2012-04-26 yiminghe@gmail.com
-   *   - ä¼˜åŒ–æ™ºèƒ½å¯¹é½ç®—æ³•
-   *   - æ…Žç”¨ resizeXX
+   *   - 优化智能对齐算法
+   *   - 慎用 resizeXX
    *
    *  2011-07-13 yiminghe@gmail.com note:
-   *   - å¢žåŠ æ™ºèƒ½å¯¹é½ï¼Œä»¥åŠå¤§å°è°ƒæ•´é€‰é¡¹
+   *   - 增加智能对齐，以及大小调整选项
    **/
   module.exports = exports['default'];
 
@@ -24149,7 +24149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
   function scrollIntoView(elem, container, config) {
     config = config || {};
-    // document å½’ä¸€åŒ–åˆ° window
+    // document 归一化到 window
     if (container.nodeType === 9) {
       container = util.getWindow(container);
     }
@@ -24188,7 +24188,7 @@ return /******/ (function(modules) { // webpackBootstrap
         left: util.scrollLeft(win),
         top: util.scrollTop(win)
       };
-      // elem ç›¸å¯¹ container å¯è§†è§†çª—çš„è·ç¦»
+      // elem 相对 container 可视视窗的距离
       diffTop = {
         left: elemOffset.left - winScroll.left - offsetLeft,
         top: elemOffset.top - winScroll.top - offsetTop
@@ -24206,8 +24206,8 @@ return /******/ (function(modules) { // webpackBootstrap
         left: container.scrollLeft,
         top: container.scrollTop
       };
-      // elem ç›¸å¯¹ container å¯è§†è§†çª—çš„è·ç¦»
-      // æ³¨æ„è¾¹æ¡†, offset æ˜¯è¾¹æ¡†åˆ°æ ¹èŠ‚ç‚¹
+      // elem 相对 container 可视视窗的距离
+      // 注意边框, offset 是边框到根节点
       diffTop = {
         left: elemOffset.left - (containerOffset.left + (parseFloat(util.css(container, 'borderLeftWidth')) || 0)) - offsetLeft,
         top: elemOffset.top - (containerOffset.top + (parseFloat(util.css(container, 'borderTopWidth')) || 0)) - offsetTop
@@ -24219,13 +24219,13 @@ return /******/ (function(modules) { // webpackBootstrap
     }
 
     if (diffTop.top < 0 || diffBottom.top > 0) {
-      // å¼ºåˆ¶å‘ä¸Š
+      // 强制向上
       if (alignWithTop === true) {
         util.scrollTop(container, containerScroll.top + diffTop.top);
       } else if (alignWithTop === false) {
         util.scrollTop(container, containerScroll.top + diffBottom.top);
       } else {
-        // è‡ªåŠ¨è°ƒæ•´
+        // 自动调整
         if (diffTop.top < 0) {
           util.scrollTop(container, containerScroll.top + diffTop.top);
         } else {
@@ -24245,13 +24245,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
     if (allowHorizontalScroll) {
       if (diffTop.left < 0 || diffBottom.left > 0) {
-        // å¼ºåˆ¶å‘ä¸Š
+        // 强制向上
         if (alignWithLeft === true) {
           util.scrollLeft(container, containerScroll.left + diffTop.left);
         } else if (alignWithLeft === false) {
           util.scrollLeft(container, containerScroll.left + diffBottom.left);
         } else {
-          // è‡ªåŠ¨è°ƒæ•´
+          // 自动调整
           if (diffTop.left < 0) {
             util.scrollLeft(container, containerScroll.left + diffTop.left);
           } else {
@@ -24292,12 +24292,12 @@ return /******/ (function(modules) { // webpackBootstrap
     var doc = elem.ownerDocument;
     var body = doc.body;
     var docElem = doc && doc.documentElement;
-    // æ ¹æ® GBS æœ€æ–°æ•°æ®ï¼ŒA-Grade Browsers éƒ½å·²æ”¯æŒ getBoundingClientRect æ–¹æ³•ï¼Œä¸ç”¨å†è€ƒè™‘ä¼ ç»Ÿçš„å®žçŽ°æ–¹å¼
+    // 根据 GBS 最新数据，A-Grade Browsers 都已支持 getBoundingClientRect 方法，不用再考虑传统的实现方式
     box = elem.getBoundingClientRect();
 
-    // æ³¨ï¼šjQuery è¿˜è€ƒè™‘å‡åŽ» docElem.clientLeft/clientTop
-    // ä½†æµ‹è¯•å‘çŽ°ï¼Œè¿™æ ·åè€Œä¼šå¯¼è‡´å½“ html å’Œ body æœ‰è¾¹è·/è¾¹æ¡†æ ·å¼æ—¶ï¼ŒèŽ·å–çš„å€¼ä¸æ­£ç¡®
-    // æ­¤å¤–ï¼Œie6 ä¼šå¿½ç•¥ html çš„ margin å€¼ï¼Œå¹¸è¿åœ°æ˜¯æ²¡æœ‰è°ä¼šåŽ»è®¾ç½® html çš„ margin
+    // 注：jQuery 还考虑减去 docElem.clientLeft/clientTop
+    // 但测试发现，这样反而会导致当 html 和 body 有边距/边框样式时，获取的值不正确
+    // 此外，ie6 会忽略 html 的 margin 值，幸运地是没有谁会去设置 html 的 margin
 
     x = box.left;
     y = box.top;
@@ -24314,13 +24314,13 @@ return /******/ (function(modules) { // webpackBootstrap
     // getClientBoundingRect we have already forced a reflow, so it is not
     // too expensive just to query them all.
 
-    // ie ä¸‹åº”è¯¥å‡åŽ»çª—å£çš„è¾¹æ¡†å§ï¼Œæ¯•ç«Ÿé»˜è®¤ absolute éƒ½æ˜¯ç›¸å¯¹çª—å£å®šä½çš„
-    // çª—å£è¾¹æ¡†æ ‡å‡†æ˜¯è®¾ documentElement ,quirks æ—¶è®¾ç½® body
-    // æœ€å¥½ç¦æ­¢åœ¨ body å’Œ html ä¸Šè¾¹æ¡† ï¼Œä½† ie < 9 html é»˜è®¤æœ‰ 2px ï¼Œå‡åŽ»
-    // ä½†æ˜¯éž ie ä¸å¯èƒ½è®¾ç½®çª—å£è¾¹æ¡†ï¼Œbody html ä¹Ÿä¸æ˜¯çª—å£ ,ie å¯ä»¥é€šè¿‡ html,body è®¾ç½®
-    // æ ‡å‡† ie ä¸‹ docElem.clientTop å°±æ˜¯ border-top
-    // ie7 html å³çª—å£è¾¹æ¡†æ”¹å˜ä¸äº†ã€‚æ°¸è¿œä¸º 2
-    // ä½†æ ‡å‡† firefox/chrome/ie9 ä¸‹ docElem.clientTop æ˜¯çª—å£è¾¹æ¡†ï¼Œå³ä½¿è®¾äº† border-top ä¹Ÿä¸º 0
+    // ie 下应该减去窗口的边框吧，毕竟默认 absolute 都是相对窗口定位的
+    // 窗口边框标准是设 documentElement ,quirks 时设置 body
+    // 最好禁止在 body 和 html 上边框 ，但 ie < 9 html 默认有 2px ，减去
+    // 但是非 ie 不可能设置窗口边框，body html 也不是窗口 ,ie 可以通过 html,body 设置
+    // 标准 ie 下 docElem.clientTop 就是 border-top
+    // ie7 html 即窗口边框改变不了。永远为 2
+    // 但标准 firefox/chrome/ie9 下 docElem.clientTop 是窗口边框，即使设了 border-top 也为 0
 
     x -= docElem.clientLeft || body.clientLeft || 0;
     y -= docElem.clientTop || body.clientTop || 0;
@@ -24387,10 +24387,10 @@ return /******/ (function(modules) { // webpackBootstrap
     // http://msdn.microsoft.com/en-us/library/ms535231.aspx
     var ret = elem[CURRENT_STYLE] && elem[CURRENT_STYLE][name];
 
-    // å½“ width/height è®¾ç½®ä¸ºç™¾åˆ†æ¯”æ—¶ï¼Œé€šè¿‡ pixelLeft æ–¹å¼è½¬æ¢çš„ width/height å€¼
-    // ä¸€å¼€å§‹å°±å¤„ç†äº†! CUSTOM_STYLE.height,CUSTOM_STYLE.width ,cssHook è§£å†³@2011-08-19
-    // åœ¨ ie ä¸‹ä¸å¯¹ï¼Œéœ€è¦ç›´æŽ¥ç”¨ offset æ–¹å¼
-    // borderWidth ç­‰å€¼ä¹Ÿæœ‰é—®é¢˜ï¼Œä½†è€ƒè™‘åˆ° borderWidth è®¾ä¸ºç™¾åˆ†æ¯”çš„æ¦‚çŽ‡å¾ˆå°ï¼Œè¿™é‡Œå°±ä¸è€ƒè™‘äº†
+    // 当 width/height 设置为百分比时，通过 pixelLeft 方式转换的 width/height 值
+    // 一开始就处理了! CUSTOM_STYLE.height,CUSTOM_STYLE.width ,cssHook 解决@2011-08-19
+    // 在 ie 下不对，需要直接用 offset 方式
+    // borderWidth 等值也有问题，但考虑到 borderWidth 设为百分比的概率很小，这里就不考虑了
 
     // From the awesome hack by Dean Edwards
     // http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
@@ -24503,7 +24503,7 @@ return /******/ (function(modules) { // webpackBootstrap
       // firefox chrome documentElement.scrollHeight< body.scrollHeight
       // ie standard mode : documentElement.scrollHeight> body.scrollHeight
       d.documentElement['scroll' + name],
-      // quirks : documentElement.scrollHeight æœ€å¤§ç­‰äºŽå¯è§†çª—å£å¤šä¸€ç‚¹ï¼Ÿ
+      // quirks : documentElement.scrollHeight 最大等于可视窗口多一点？
       d.body['scroll' + name], domUtils['viewport' + name](d));
     };
 
@@ -24514,14 +24514,14 @@ return /******/ (function(modules) { // webpackBootstrap
       var body = doc.body;
       var documentElement = doc.documentElement;
       var documentElementProp = documentElement[prop];
-      // æ ‡å‡†æ¨¡å¼å– documentElement
-      // backcompat å– body
+      // 标准模式取 documentElement
+      // backcompat 取 body
       return doc.compatMode === 'CSS1Compat' && documentElementProp || body && body[prop] || documentElementProp;
     };
   });
 
   /*
-   å¾—åˆ°å…ƒç´ çš„å¤§å°ä¿¡æ¯
+   得到元素的大小信息
    @param elem
    @param name
    @param {String} [extra]  'padding' : (css width) + padding
@@ -24632,7 +24632,7 @@ return /******/ (function(modules) { // webpackBootstrap
     };
   });
 
-  // è®¾ç½® elem ç›¸å¯¹ elem.ownerDocument çš„åæ ‡
+  // 设置 elem 相对 elem.ownerDocument 的坐标
   function setOffset(elem, offset) {
     // set position first, in-case top/left are set even on static elem
     if (css(elem, 'position') === 'static') {
@@ -25231,14 +25231,14 @@ return /******/ (function(modules) { // webpackBootstrap
     },
 
     mod: function mod(x, y) {
-      // è´Ÿæ•°æ—¶ä¸æ˜¯é•œåƒå…³ç³»
+      // 负数时不是镜像关系
       return x - y * floor(x / y);
     },
 
     // month: 0 based
     getFixedDate: function getFixedDate(year, month, dayOfMonth) {
       var prevYear = year - 1;
-      // è€ƒè™‘å…¬å…ƒå‰
+      // 考虑公元前
       return DAYS_OF_YEAR * prevYear + floor(prevYear / 4) - floor(prevYear / 100) + floor(prevYear / 400) + getDayOfYear(year, month, dayOfMonth);
     },
 
@@ -32888,7 +32888,7 @@ return /******/ (function(modules) { // webpackBootstrap
               onClick: this.previousCentury,
               title: locale.previousCentury
             },
-            'Â«'
+            '«'
           ),
           _react2["default"].createElement(
             'div',
@@ -32905,7 +32905,7 @@ return /******/ (function(modules) { // webpackBootstrap
               onClick: this.nextCentury,
               title: locale.nextCentury
             },
-            'Â»'
+            '»'
           )
         ),
         _react2["default"].createElement(
@@ -32999,7 +32999,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
       var start = year - yearSelectOffset;
       var end = start + yearSelectTotal;
-      var suffix = locale.year === 'å¹´' ? 'å¹´' : '';
+      var suffix = locale.year === '年' ? '年' : '';
 
       var options = [];
       for (var index = start; index < end; index++) {
@@ -37739,7 +37739,7 @@ return /******/ (function(modules) { // webpackBootstrap
               React.createElement(
                 'span',
                 { className: prefixCls + '-slash' },
-                'ï¼'
+                '／'
               ),
               allPages
             ),
@@ -38143,7 +38143,7 @@ return /******/ (function(modules) { // webpackBootstrap
       _this.keysAnimating = [];
       _this.placeholderTimeoutIds = {};
 
-      // ç¬¬ä¸€æ¬¡è¿›å…¥ï¼Œé»˜è®¤è¿›åœº
+      // 第一次进入，默认进场
       var children = (0, _utils.toArrayChildren)((0, _utils.getChildrenFromProps)(_this.props));
       children.forEach(function (child) {
         if (!child || !child.key) {
@@ -38601,7 +38601,7 @@ return /******/ (function(modules) { // webpackBootstrap
       ret.push(c);
     });
 
-    // ä¿æŒåŽŸæœ‰çš„é¡ºåº
+    // 保持原有的顺序
     pendingChildren.forEach(function (c) {
       var originIndex = prev.indexOf(c);
       if (originIndex >= 0) {
@@ -43425,7 +43425,7 @@ return /******/ (function(modules) { // webpackBootstrap
   var _gregorianCalendarLibLocaleZh_CN2 = _interopRequireDefault(_gregorianCalendarLibLocaleZh_CN);
 
   exports['default'] = {
-    clear: 'æ¸…é™¤',
+    clear: '清除',
     format: _gregorianCalendarFormatLibLocaleZh_CN2['default'],
     calendar: _gregorianCalendarLibLocaleZh_CN2['default']
   };
@@ -44689,8 +44689,8 @@ return /******/ (function(modules) { // webpackBootstrap
     componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
       if ('value' in nextProps) {
         if (this._cacheTreeNodesStates !== 'no' && this._savedValue && nextProps.value === this._savedValue) {
-          // åªå¤„ç†ç”¨æˆ·ç›´æŽ¥ åœ¨ onChange é‡Œ this.setState({value}); å¹¶ä¸”æ˜¯åŒä¸€ä¸ªå¯¹è±¡å¼•ç”¨ã€‚
-          // åŽç»­å¯ä»¥å¯¹æ¯”å¯¹è±¡é‡Œè¾¹çš„å€¼ã€‚
+          // 只处理用户直接 在 onChange 里 this.setState({value}); 并且是同一个对象引用。
+          // 后续可以对比对象里边的值。
           this._cacheTreeNodesStates = true;
         } else {
           this._cacheTreeNodesStates = false;
@@ -44758,7 +44758,7 @@ return /******/ (function(modules) { // webpackBootstrap
       // return;
 
       // this.setOpenState(open);
-      // åŠ å»¶æ—¶ï¼Œæ‰èƒ½äº§ç”ŸåŠ¨ç”»ï¼Œä»€ä¹ˆæƒ…å†µï¼Ÿï¼Ÿ
+      // 加延时，才能产生动画，什么情况？？
       setTimeout(function () {
         _this.setOpenState(open);
       }, 10);
@@ -44871,7 +44871,7 @@ return /******/ (function(modules) { // webpackBootstrap
           }]);
         }
         // if (!checkEvt && value.indexOf(selectedValue) !== -1) {
-        // è®¾ç½® multiple æ—¶ä¼šæœ‰bugã€‚ï¼ˆisValueChange å·²æœ‰æ£€æŸ¥ï¼Œæ­¤å¤„æ³¨é‡ŠæŽ‰ï¼‰
+        // 设置 multiple 时会有bug。（isValueChange 已有检查，此处注释掉）
         // return;
         // }
       } else {
@@ -44932,14 +44932,14 @@ return /******/ (function(modules) { // webpackBootstrap
     },
 
     onOuterFocus: function onOuterFocus() {
-      // æ­¤å¤„ä¼šå½±å“å±•å¼€æ”¶èµ·åŠ¨ç”»ï¼Œç±»ä¼¼é—®é¢˜åœ¨ onDropdownVisibleChange é‡Œçš„ setTimeout ã€‚
+      // 此处会影响展开收起动画，类似问题在 onDropdownVisibleChange 里的 setTimeout 。
       // this.setState({
       //   focused: true,
       // });
     },
 
     onOuterBlur: function onOuterBlur() {
-      // æ­¤å¤„ä¼šå½±å“å±•å¼€æ”¶èµ·åŠ¨ç”»ï¼Œç±»ä¼¼é—®é¢˜åœ¨ onDropdownVisibleChange é‡Œçš„ setTimeout ã€‚
+      // 此处会影响展开收起动画，类似问题在 onDropdownVisibleChange 里的 setTimeout 。
       // this.setState({
       //   focused: false,
       // });
@@ -45068,7 +45068,7 @@ return /******/ (function(modules) { // webpackBootstrap
       if (this._cachetreeData && this._cacheTreeNodesStates && this._checkedNodes) {
         this.checkedTreeNodes = checkedTreeNodes = this._checkedNodes;
       } else {
-        // getTreeNodesStates è€—æ—¶ï¼Œåšç¼“å­˜å¤„ç†ã€‚
+        // getTreeNodesStates 耗时，做缓存处理。
         this._treeNodesStates = (0, _util.getTreeNodesStates)(this.renderedTreeData || _props.children, value.map(function (item) {
           return item.value;
         }));
@@ -45146,8 +45146,8 @@ return /******/ (function(modules) { // webpackBootstrap
       checkedTreeNodes.forEach(function (itemObj) {
         var iArr = itemObj.pos.split('-');
         if (itemObj.pos === unCheckPos || nArr.length > iArr.length && (0, _util.isInclude)(iArr, nArr) || nArr.length < iArr.length && (0, _util.isInclude)(nArr, iArr)) {
-          // è¿‡æ»¤æŽ‰ çˆ¶çº§èŠ‚ç‚¹ å’Œ æ‰€æœ‰å­èŠ‚ç‚¹ã€‚
-          // å› ä¸º nodeèŠ‚ç‚¹ ä¸é€‰æ—¶ï¼Œå…¶ çˆ¶çº§èŠ‚ç‚¹ å’Œ æ‰€æœ‰å­èŠ‚ç‚¹ éƒ½ä¸é€‰ã€‚
+          // 过滤掉 父级节点 和 所有子节点。
+          // 因为 node节点 不选时，其 父级节点 和 所有子节点 都不选。
           return;
         }
         newCkTns.push(itemObj);
@@ -45231,8 +45231,8 @@ return /******/ (function(modules) { // webpackBootstrap
         return;
       }
       // if (props.treeCheckable) {
-      //   // åœ¨ treeCheckable æ—¶ï¼Œç›¸å½“äºŽè§¦å‘èŠ‚ç‚¹çš„ check(uncheck) äº‹ä»¶ï¼Œ
-      //   // ä½†å‡å¦‚ dropdown æ²¡å±•å¼€è¿‡ï¼Œtree ä¹Ÿå°±æ²¡æ¸²æŸ“å¥½ï¼Œè§¦å‘ä¸äº†treeå†…éƒ¨æ–¹æ³•ã€‚
+      //   // 在 treeCheckable 时，相当于触发节点的 check(uncheck) 事件，
+      //   // 但假如 dropdown 没展开过，tree 也就没渲染好，触发不了tree内部方法。
       // }
       var label = undefined;
       var value = this.state.value.filter(function (singleValue) {
@@ -45716,7 +45716,7 @@ return /******/ (function(modules) { // webpackBootstrap
         }
       });
 
-      // æŠŠç­›é€‰èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹ï¼ˆå¦‚æžœæœªç­›é€‰åˆ°ï¼‰åŒ…å«è¿›æ¥
+      // 把筛选节点的父节点（如果未筛选到）包含进来
       var processedPoss = [];
       filterPoss.forEach(function (pos) {
         var arr = pos.split('-');
@@ -45818,7 +45818,7 @@ return /******/ (function(modules) { // webpackBootstrap
       );
 
       var recursive = function recursive(children) {
-        // æ³¨æ„: å¦‚æžœç”¨ React.Children.map éåŽ†ï¼Œkey ä¼šè¢«ä¿®æ”¹æŽ‰ã€‚
+        // 注意: 如果用 React.Children.map 遍历，key 会被修改掉。
         return _rcUtil2['default'].Children.toArray(children).map(function (child) {
           if (child && child.props.children) {
             // null or String has no Prop
